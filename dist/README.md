@@ -32,7 +32,9 @@ in theme.json
 
 ### Info
 
-- Will be released on github soon - expect November - December
 - Will try to work on load times (not happening lol)
 - more features - maybe? :wink:
-- This is  
+- Updated yearly for major updates.
+- Updated monthly for minor updates.
+- Updated weekly - triweekly for hotfix and sometimes minor updates.
+- <b>Are you even reading this? 😶<b>
