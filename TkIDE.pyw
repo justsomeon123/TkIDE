@@ -1,11 +1,14 @@
 #Version:1.5.4b1
 #Look at README.md  
 
-import string,random,os,source.ImportantFunctions,json, source.SyntaxHighlighting
+import string,random,os,source.ImportantFunctions,json, source.SyntaxHighlighting,imghdr
+import tkinter
 from tkinter import *
 from tkinter import ttk,filedialog
 from typing import Union
 from source.CustomClasses import *
+#Make sure pil is always after any classes with a class called Image or ImageTk
+from PIL import Image, ImageTk
 
 DEV = False
 
@@ -89,9 +92,16 @@ class Editor():
 
     def OpenFile(self):
         filename = filedialog.askopenfilename(initialdir = '/',title = "Choose a file to edit",)
+        if imghdr.what(filename) in ["png","gif","jpg","jpeg"]:
+            self.FileName.set(filename)
+            self.ImageTab()
+            return
         print(filename)
         self.FileName.set(filename)
-        self.AddTab()
+        self.NewTab()
+    
+
+        
     
     
     def CreateFile(self):
@@ -110,13 +120,13 @@ class Editor():
         self.CancelButton = Button(self.deleteroot,text="Cancel",command=lambda:self.deleteroot.destroy()).pack()
     
     def DeleteFile(self):
-        filename = filedialog.askopenfilename(initialdir = '/',title = "Choose file to delete",)
+        filename = filedialog.askopenfilename(initialdir = '/',title    = "Choose file to delete",)
         os.remove(filename)
     
     def RandomString(self):
         return ''.join(random.choices(string.ascii_letters,k=10))
 
-    def AddTab(self):
+    def NewTab(self):
         with open(self.FileName.get(),encoding="UTF-8") as f:
             self.FileContent.set(f.read())
         
@@ -141,12 +151,38 @@ class Editor():
         #Higlighting
         self.ReHighlight(Display)
         self.root.bind("<KeyPress>",lambda event: self.ReHighlight(Display))
+    
+    def ImageTab(self):
+        self.MainEditorCount += 1
+        RandomString = self.RandomString()
+        self.RandomTabStrings.append(RandomString)
+        E = self.Pages[RandomString]  = ttk.Frame(self.MainEditor)
+
+        self.MainEditor.add(E, text=f"Tab {self.FileName.get()}",image=self.FileIcon,compound="left") 
+        #n can't be zero
+        n=8
+        image = Image.open(self.FileName.get())
+        print(image.size)
+        print(f'({E.winfo_screenwidth()},{E.winfo_screenheight()})')
+        if image.size[0] * n < E.winfo_screenwidth(): 
+            print('got past step one')
+            if image.size[1] * n < E.winfo_screenheight():        
+                [imageSizeWidth, imageSizeHeight] = image.size
+                newImageSizeWidth = int(imageSizeWidth*n)
+                newImageSizeHeight = int(imageSizeHeight*n) 
+                image = image.resize((newImageSizeWidth, newImageSizeHeight), Image.ANTIALIAS)
+                print(image.size)
+        img = ImageTk.PhotoImage(image)
+        label = Label(E, image=img,text="testing")
+        label.image = img # required for image to appear
+        label.pack()
+
         
 
     def _findfiletype(self,file:str):
         e = file.split('.')
         c = e[-1]
-        return c
+        return c 
     
 
     
@@ -163,4 +199,4 @@ Editor()
 
 #Build with
 
-#pyinstaller --onefile  --icon=icon.ico  --exclude-module _bootlocale   "Loader.pyw"
+#pyinstaller --onefile  --icon=icon.ico  --exclude-module _bootlocale   "TkIDE.pyw"
