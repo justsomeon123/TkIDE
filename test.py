@@ -1,23 +1,33 @@
-from tkinter import *
-from tkinter import ttk
-from source.CustomClasses import *
+import tkinter as tk
+import tkinter.ttk as ttk
 
-root=Tk()
-root.title("Example")
-notebook=ScrollableNotebook(root,[],{},wheelscroll=True,tabmenu=True)
-frame1=Frame(notebook)
-frame2=Frame(notebook)
-frame3=Frame(notebook)
-frame4=Frame(notebook)
-notebook.add(frame1,text="I am Tab One")
-notebook.add(frame2,text="I am Tab Two")
-notebook.add(frame3,text="I am Tab Three")
-notebook.add(frame4,text="I Forgot How to Count")
-notebook.pack(fill="both",expand=True)
-text=Text(frame1)
-text.pack()
-Label(frame2,text="I am Frame 2").pack()
-Label(frame3,text="I am Frame 3").pack()
-Label(frame4,text="You know i'm Frame 4").pack()
-text.insert(INSERT,"Hello World!")
-root.mainloop()
+
+class Example(tk.Tk):
+    def __init__(self):
+        tk.Tk.__init__(self)
+        self.canvas = tk.Canvas(self, borderwidth=0)
+        self.frame = tk.Frame(self.canvas)
+
+        self.vsb = tk.Scrollbar(self, orient="horizontal", command=self.canvas.xview)
+        self.vsb.grid(row=1, column=0, sticky="nsew")
+
+        self.canvas.configure(xscrollcommand=self.vsb.set)
+        self.canvas.grid(row=0, column=0, sticky="nsew")
+        self.canvas.create_window((3,2), window=self.frame, anchor="nw", tags="self.frame")
+
+        self.frame.bind("<Configure>", self.frame_configure)
+        self.populate()
+
+    def populate(self):
+        tabs = ttk.Notebook(self.frame, width=100, height=100)
+        for tab in range(10):
+            tabs.add(ttk.Frame(tabs), text=" Tab {}  ".format(tab+1))
+        tabs.grid(row=0, column=0, sticky="ew")
+
+
+    def frame_configure(self, event):
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+if __name__ == "__main__":
+    app = Example()
+    app.mainloop()

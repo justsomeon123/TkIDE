@@ -44,7 +44,7 @@ class Editor():
         source.ImportantFunctions.FullScreen(self.root)
 
         #self.__settingsinit__()
-        #SECTION:Menus
+        #SECTION:Menus  
         self.Menu = Menu(self.root)
         ##SUBSECTION:File Menu
         self.FileMenu = Menu(self.Menu,tearoff=0)
@@ -135,7 +135,7 @@ class Editor():
         self.RandomTabStrings.append(RandomString)
         E = self.Pages[RandomString]  = ttk.Frame(self.MainEditor)
         
-        self.MainEditor.add(E, text=f"Tab {self.FileName.get()}",image=self.FileIcon,compound="left")
+        self.MainEditor.add(E, text=f"{self.FileName.get().split('/')[-1]}",image=self.FileIcon,compound="left")
         SVBar = Scrollbar(E)
         SVBar.pack (side = RIGHT, fill = "y")
         SHBar = Scrollbar(E, orient = HORIZONTAL)
