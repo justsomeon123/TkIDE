@@ -1,16 +1,18 @@
-#Version:1.5.4b1
-#Look at README.md  
+#Version:1.5.5
+#Look at README.md for more information
+#############################################################################################
+#TkIDE.pyw
 
-import string,random,os,source.ImportantFunctions,json, source.SyntaxHighlighting,imghdr
-import tkinter
+import string,random,os,source.ImportantFunctions,json, source.SyntaxHighlighting,imghdr,contextlib,io,sys#from extensions import * #import all extensions
 from tkinter import *
 from tkinter import ttk,filedialog
 from typing import Union
 from source.CustomClasses import *
-#Make sure pil is always after any classes with a class called Image or ImageTk
+#Make sure pil is always after any modules with a class called Image or ImageTk
 from PIL import Image, ImageTk
 
 DEV = False
+
 
 settings = {}
 class Editor():
@@ -33,7 +35,9 @@ class Editor():
         self.FileIcon = PhotoImage('FileIcon',file=self.settings["file-icon"])
         self.root.bind('<Control-o>',lambda event:self.OpenFile())
         self.root.bind('<Control-s>',lambda event:self.Save())
-        self.root.bind('Control-n',lambda event:self.CreateFile)
+        self.root.bind('<Control-n>',lambda event:self.CreateFile)
+        self.root.bind('<Control-d>',lambda event:self.DeleteFileConfirm())
+        self.root.bind('<Control-r>',lambda event:self.Run())
 
 
         
@@ -54,8 +58,14 @@ class Editor():
         self.FileMenu.add_separator(background="red")
         self.FileMenu.add_command(label="Delete a File",foreground="red",command=lambda:self.DeleteFileConfirm(),background="dark red")
         ##SUBSECTION:File Menu:END
+        ##SUBSECTION:Run Menu
+        self.RunMenu = Menu(self.Menu,tearoff=0)
+        self.RunMenu.add_command(label='Run (PYTHON ONLY)',command=lambda:self.Run())
+        #self.RunMenu.add_command(label='Run (PYTHON ONLY) with arguments',command=lambda:self.RunWithArgs())
+        ##SUBSECTION:Run Menu:END
         ##SUBSECTION:Menu adding
         self.Menu.add_cascade(label="File",menu=self.FileMenu)
+        self.Menu.add_cascade(label="Run",menu=self.RunMenu)
         self.root.config(menu=self.Menu)
         ##SUBSECTION:Menu adding:END
         
@@ -75,6 +85,24 @@ class Editor():
         #SECTION:Loop
         self.root.mainloop()
         
+    def Run(self):
+        self.run_output = io.StringIO()
+
+        index = self.MainEditor.index(CURRENT)
+        RandomString = self.RandomTabStrings[index]
+        Frame = self.Pages[RandomString]
+        children = Frame.winfo_children()
+        for child in children:
+            if type(child) in [IDEText,Text]:
+                self.Display = child
+        with open(self.FileName.get(),'r') as f:
+            resave = self.Display.get('1.0','end-1c')
+            root = Toplevel()
+            root.title(f'Run Output:{self.FileName.get()}')
+            outputtext = Text(root,width=100,height=20)
+            outputtext.pack(expand=True,fill=BOTH)
+            with contextlib.redirect_stdout(self.run_output):
+                exec(resave+"outputtext.insert(END,self.run_output.getvalue())")
 
     #SECTION:SAVE   
     def Save(self):
@@ -92,36 +120,32 @@ class Editor():
 
     def OpenFile(self):
         filename = filedialog.askopenfilename(initialdir = '/',title = "Choose a file to edit",)
-        if imghdr.what(filename) in ["png","gif","jpg","jpeg"]:
+        if imghdr.what(filename) in ["png","gif","jpg","jpeg","ico"]:
             self.FileName.set(filename)
             self.ImageTab()
             return
         print(filename)
         self.FileName.set(filename)
         self.NewTab()
-    
 
-        
-    
-    
     def CreateFile(self):
         f = filedialog.asksaveasfile(mode='w')
         if f is None:
             return
-        self.root.destroy() 
         self.FileName.set(f.name)
 
     def DeleteFileConfirm(self):
-        self.deleteroot = Tk()
+        self.deleteroot = Toplevel()
         self.deleteroot.title('Are you sure?!')
         Label(self.deleteroot,text="Are you sure that you want to delete a file?").pack()
         Label(self.deleteroot,text="(Ireversible)",foreground="red").pack()
         self.DeleteButton = Button(self.deleteroot,text="Delete",foreground="red",activeforeground="dark red",background="dark red",activebackground="red",command=lambda:self.DeleteFile()).pack()
         self.CancelButton = Button(self.deleteroot,text="Cancel",command=lambda:self.deleteroot.destroy()).pack()
     
-    def DeleteFile(self):
+    def DeleteFile(self,root):
         filename = filedialog.askopenfilename(initialdir = '/',title    = "Choose file to delete",)
         os.remove(filename)
+        self.deleteroot.destroy()
     
     def RandomString(self):
         return ''.join(random.choices(string.ascii_letters,k=10))
