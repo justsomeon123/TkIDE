@@ -1,5 +1,9 @@
 # TkIDE  Version 1.5.5
+
+# Disclaimers
+- ## WARNING: TkIDE is a work in progress project. I am not responsible for any damage done to your computer.
 ## Included features
+
 
 ### All new syntax highlighting 
 - Disabled by default - go to theme.json and copy values in "old" and put that into the main part json
@@ -52,6 +56,8 @@ also it is not an ide its just a trash code editor with a few features.
 - I am working on an extension system that will allow for smaller builds.
 - I am working on a system to run python files and output them to a tkinter terminal.
     > Note:I might  on adding the terminal as input and output for a more intergrated experience.
+
+
 
 ## ***Beware***
 - ### **TkIDE** could be closed at any time.
