@@ -213,7 +213,8 @@ class Editor():
     def ReHighlight(self,Display:Union[IDEText,Text]):
         source.SyntaxHighlighting.PythonHighlight(Display,self.HighlightThemes)
 
-
+    def ReadOnlyFile(self):
+        self.Display.config(state=DISABLED)   
         
         
         

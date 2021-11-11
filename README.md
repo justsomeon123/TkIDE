@@ -37,7 +37,7 @@ in theme.json (Disabled by default)
 
 ## Important Things
 
-### Disclaimer:TkIDE is <b><b>NOT</b></b> pure tkinter. There are custom classes and in the future there may be some wxPython or PyQt
+### Disclaimer:TkIDE is <b><b>NOT</b></b> pure tkinter. There are custom classes amd in the future there may be some wxPython or PyQt
 <br>
 
 also it is not an ide its just a trash code editor with a few features. 
@@ -45,7 +45,8 @@ also it is not an ide its just a trash code editor with a few features.
 ### Info
 
 - Will try to work on load times (not happening lol)
-    > On the previous note, numba might be used in the future. 
+    > On the previous note, numba might be used in the future.
+    > On that note, I might now use pyjion as an attempt to speed it up.
 - more features - maybe?
 - Updated yearly for major updates.
 -  Usually updated monthly for minor updates.
