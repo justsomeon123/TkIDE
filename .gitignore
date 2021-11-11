@@ -1,1 +1,9 @@
+#unneccsary files
 **/build
+.replit
+*.txt
+#pyc files
+*.pyc
+**/__pycache__
+#venv
+**/TkIDE
