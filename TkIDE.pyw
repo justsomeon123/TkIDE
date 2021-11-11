@@ -3,18 +3,14 @@
 #############################################################################################
 #TkIDE.pyw
 
-import string,random,os,source.ImportantFunctions,json, source.SyntaxHighlighting,imghdr,contextlib,io,sys#from extensions import * #import all extensions
-from tkinter import *
-from tkinter import ttk,filedialog
+import string,random,os,source.ImportantFunctions,json, source.SyntaxHighlighting,imghdr,contextlib,io#from extensions import * #import all extensions
+from tkinter import ttk,filedialog,Text,Tk,StringVar,Menu,CURRENT,Toplevel,Button,BOTTOM,END,HORIZONTAL,DISABLED
 from typing import Union
 from source.CustomClasses import *
 #Make sure pil is always after any modules with a class called Image or ImageTk
 from PIL import Image, ImageTk
 
-DEV = False
 
-
-settings = {}
 class Editor():
     def __init__(self) -> None:
         
@@ -25,7 +21,7 @@ class Editor():
             self.settings = json.load(f)
         with open(self.settings["EditorColors"]) as f:
             self.HighlightThemes:dict = json.load(f)
-        settings.update(self.settings)
+
                 
         self.FileName = StringVar()
         self.FileName.set('')
