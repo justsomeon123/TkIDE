@@ -142,7 +142,7 @@ class Editor():
         self.DeleteButton = Button(self.deleteroot,text="Delete",foreground="red",activeforeground="dark red",background="dark red",activebackground="red",command=lambda:self.DeleteFile()).pack()
         self.CancelButton = Button(self.deleteroot,text="Cancel",command=lambda:self.deleteroot.destroy()).pack()
     
-    def DeleteFile(self,root):
+    def DeleteFile(self):
         filename = filedialog.askopenfilename(initialdir = '/',title    = "Choose file to delete",)
         os.remove(filename)
         self.deleteroot.destroy()
