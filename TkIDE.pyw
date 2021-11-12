@@ -178,9 +178,9 @@ class Editor():
         self.RandomTabStrings.append(RandomString)
         E = self.Pages[RandomString]  = ttk.Frame(self.MainEditor)
 
-        self.MainEditor.add(E, text=f"Tab {self.FileName.get()}",image=self.FileIcon,compound="left") 
+        self.MainEditor.add(E, text=f"{self.FileName.get().split('/')[-1]}",image=self.FileIcon,compound="left") 
         #n can't be zero
-        n=8
+        n=self.settings['ImageSize']
         image = Image.open(self.FileName.get())
         print(image.size)
         print(f'({E.winfo_screenwidth()},{E.winfo_screenheight()})')

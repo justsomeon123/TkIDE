@@ -46,9 +46,10 @@ also it is not an ide its just a trash code editor with a few features.
 
 - Will try to work on load times (not happening lol)
     > Working with pyinstaller not onefile mode and venvs
+    > Works, kind of, but not really well
 - more features - maybe?
 - Updated yearly for major updates.
--  Usually updated monthly for minor updates.
+- Usually updated monthly for minor updates.
 - The tab system is not perfect and will probably be improved in the future.
     > If too many tabs are open the close buttons will clump togther and not work. A solution that could be implemented is to have a scrollbar for the tab system and fixing the custom tab system.
 - The syntax highlighting is not perfect and will probably be improved in the future.

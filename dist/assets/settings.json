@@ -3,8 +3,8 @@
     "file-icon":"./assets/file.png",
     "EditorColors":"./assets/theme.json",
     "DefaultFont":"./assets/fonts/Open_Sans/OpenSans-Light.ttf",
-    "NotifyOnSave":true,
     "ImageSize":8,
+    "NotifyOnSave":true,
     "SyntaxItems":  
     {
         "Python":
