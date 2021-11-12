@@ -1,4 +1,4 @@
-# TkIDE  Version 1.5.5
+# TkIDE  Version 1.5.6
 
 # Disclaimers
 - ## WARNING: TkIDE is a work in progress project. I am not responsible for any damage done to your computer.
