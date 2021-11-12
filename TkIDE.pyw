@@ -220,4 +220,5 @@ Editor()
 
 #Build with
 
-#pyinstaller --onefile  --icon=icon.ico  --exclude-module _bootlocale   "TkIDE.pyw"
+#pyinstaller --icon=icon.ico  --exclude-module _bootlocale   "TkIDE.pyw"
+#Then use inno script installer to build the installer
