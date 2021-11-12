@@ -8,5 +8,6 @@
 #venv
 /TkIDE
 /.vscode
+#hide distbrution
 /dist/TkIDE
 *.iss
