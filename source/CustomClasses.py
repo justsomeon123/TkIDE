@@ -1,4 +1,4 @@
-from tkinter import Text,Label,Scrollbar,IntVar,Frame,LEFT,RIGHT,Y,NW,NE,BOTH,font,ttk,PhotoImage,Canvas
+from tkinter import Text,Label,Scrollbar,IntVar,Frame,LEFT,RIGHT,Y,NW,NE,BOTH,font,ttk,PhotoImage,Canvas,END
 class IDEText(Text):
     '''A text widget with a new method, highlight_pattern()
 

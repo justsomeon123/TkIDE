@@ -3,8 +3,10 @@
 #############################################################################################
 #TkIDE.pyw
 
-import string,random,os,source.ImportantFunctions,json, source.SyntaxHighlighting,imghdr,contextlib,io#from extensions import * #import all extensions
-from tkinter import ttk,filedialog,Text,Tk,StringVar,Menu,CURRENT,Toplevel,Button,BOTTOM,END,HORIZONTAL,DISABLED
+import string,random,os,source.ImportantFunctions,json, source.SyntaxHighlighting,imghdr,contextlib,io
+from extensions import * #import all extensions
+from extensions import LoadExtensionPt
+from tkinter import Entry, ttk,filedialog,Text,Tk,StringVar,Menu,CURRENT,Toplevel,Button,BOTTOM,END,HORIZONTAL,DISABLED
 from typing import Union
 from source.CustomClasses import *
 #Make sure pil is always after any modules with a class called Image or ImageTk
@@ -31,9 +33,10 @@ class Editor():
         self.FileIcon = PhotoImage('FileIcon',file=self.settings["file-icon"])
         self.root.bind('<Control-o>',lambda event:self.OpenFile())
         self.root.bind('<Control-s>',lambda event:self.Save())
-        self.root.bind('<Control-n>',lambda event:self.CreateFile)
+        self.root.bind('<Control-n>',lambda event:self.CreateFile())
         self.root.bind('<Control-d>',lambda event:self.DeleteFileConfirm())
         self.root.bind('<Control-r>',lambda event:self.Run())
+        self.root.bind('<Control-Shift-p>',lambda event:self.ExtCommand())
 
 
         
@@ -57,7 +60,7 @@ class Editor():
         ##SUBSECTION:Run Menu
         self.RunMenu = Menu(self.Menu,tearoff=0)
         self.RunMenu.add_command(label='Run (PYTHON ONLY)',command=lambda:self.Run())
-        #self.RunMenu.add_command(label='Run (PYTHON ONLY) with arguments',command=lambda:self.RunWithArgs())
+        self.RunMenu.add_command(label='Run extension command',command=lambda:self.ExtCommand())
         ##SUBSECTION:Run Menu:END
         ##SUBSECTION:Menu adding
         self.Menu.add_cascade(label="File",menu=self.FileMenu)
@@ -98,7 +101,15 @@ class Editor():
             outputtext = Text(root,width=100,height=20)
             outputtext.pack(expand=True,fill=BOTH)
             with contextlib.redirect_stdout(self.run_output):
-                exec(resave+"outputtext.insert(END,self.run_output.getvalue())")
+                exec(resave)
+            outputtext.insert(END,self.run_output.getvalue())
+    
+    def ExtCommand(self):
+        root = Toplevel()
+        root.title('Run Command')
+        command = StringVar()
+        Entry(root,textvariable=command).pack(expand=True,fill=BOTH)
+        Button(root,text='Run Provided Command',command=lambda:LoadExtensionPt(command.get().split("/"))).pack(side=BOTTOM)
 
     #SECTION:SAVE   
     def Save(self):
@@ -220,5 +231,5 @@ Editor()
 
 #Build with
 
-#pyinstaller --icon=icon.ico  --exclude-module _bootlocale   "TkIDE.pyw"
+#   
 #Then use inno script installer to build the installer

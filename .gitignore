@@ -6,8 +6,9 @@
 *.pyc
 **/__pycache__
 #venv
-/TkIDE
+/TkIDE  
 /.vscode
 #hide distbrution
 /dist/TkIDE
+/dist/TkIDE_Setup.exe
 *.iss

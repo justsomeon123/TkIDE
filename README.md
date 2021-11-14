@@ -1,4 +1,5 @@
-# TkIDE  Version 1.5.5
+# TkIDE  Version 1.5.7
+Next update will be 1.6.0!! 🎉
 
 # Disclaimers
 - ## WARNING: TkIDE is a work in progress project. I am not responsible for any damage done to your computer.
@@ -45,7 +46,8 @@ also it is not an ide its just a trash code editor with a few features.
 ### Info
 
 - Will try to work on load times (not happening lol)
-    > Working with pyinstaller not onefile mode and venvs
+    > On the previous note, numba might be used in the future.
+    > On that note, I might now use pyjion as an attempt to speed it up.
 - more features - maybe?
 - Updated yearly for major updates.
 -  Usually updated monthly for minor updates.
@@ -56,6 +58,8 @@ also it is not an ide its just a trash code editor with a few features.
 - I am working on an extension system that will allow for smaller builds.
 - I am working on a system to run python files and output them to a tkinter terminal.
     > Note:I might  on adding the terminal as input and output for a more intergrated experience.
+- Running extension commands has a simple basis for now.
+  > You can now add your own commands to the extension system via the extensions folder and commands.json. To run a command type the sections of the command in the command box separated by / and press the run button. All console related code will not work.
 
 
 
