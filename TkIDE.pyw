@@ -1,21 +1,36 @@
-#Version:1.5.5
+#Version:1.6.0
 #Look at README.md for more information
 #############################################################################################
 #TkIDE.pyw
 
-import string,random,os,source.ImportantFunctions,json, source.SyntaxHighlighting,imghdr,contextlib,io
+import string,random,os,source.ImportantFunctions,json, source.SyntaxHighlighting,imghdr,source.SplashScreen
 from extensions import * #import all extensions
 from extensions import LoadExtensionPt
-from tkinter import Entry, ttk,filedialog,Text,Tk,StringVar,Menu,CURRENT,Toplevel,Button,BOTTOM,END,HORIZONTAL,DISABLED
+from tkinter import ttk,filedialog,Text,Tk,StringVar,Menu,Toplevel,Button,BOTTOM,END,HORIZONTAL,DISABLED,Entry,CURRENT
 from typing import Union
 from source.CustomClasses import *
 #Make sure pil is always after any modules with a class called Image or ImageTk
 from PIL import Image, ImageTk
+def deprint(text,debug=False):
+    if debug:
+        print(text)
 
 
 class Editor():
     def __init__(self) -> None:
         
+        splash = Tk()
+        splash.image = ImageTk.PhotoImage(Image.open('assets/alticon.png').resize((128,128),Image.NEAREST))
+        splash.wm_attributes("-transparentcolor", "white")
+        label = Label(splash, image=splash.image, bg='white')
+        splash.overrideredirect(True)
+        splash.lift()
+        splash.wm_attributes("-topmost", True)
+        splash.wm_attributes("-disabled", True)
+        splash.eval('tk::PlaceWindow . center')
+        label.pack()
+        splash.after(1000, lambda: splash.destroy())
+        splash.mainloop()
         #SECTION:Setup
         self.root = Tk()
 
@@ -28,22 +43,25 @@ class Editor():
         self.FileName = StringVar()
         self.FileName.set('')
         self.FileContent = StringVar()
+        self.FolderName = StringVar()
+        self.FolderName.set('Open a Folder')
 
-        self.MainIcon = PhotoImage('MainIcon',file=self.settings["icon"])
-        self.FileIcon = PhotoImage('FileIcon',file=self.settings["file-icon"])
+        self.root.MainIcon = ImageTk.PhotoImage(Image.open(self.settings["icon"]),Image.NEAREST)
+        self.root.FileIcon = ImageTk.PhotoImage(Image.open(self.settings["file-icon"]),Image.NEAREST)
         self.root.bind('<Control-o>',lambda event:self.OpenFile())
         self.root.bind('<Control-s>',lambda event:self.Save())
         self.root.bind('<Control-n>',lambda event:self.CreateFile())
         self.root.bind('<Control-d>',lambda event:self.DeleteFileConfirm())
         self.root.bind('<Control-r>',lambda event:self.Run())
-        self.root.bind('<Control-Shift-p>',lambda event:self.ExtCommand())
+        self.root.bind('<Control-k>',lambda event:self.OpenFolder())
+        self.root.bind('<Control-e>',lambda event:self.ExtCommand())
 
 
         
 
         #SECTION:Root Management        
-        self.root.iconphoto(True,self.MainIcon)
-        self.root.title('Tk IDE +')
+        self.root.iconphoto(True,self.root.MainIcon)
+        self.root.title('TkIDE')
         source.ImportantFunctions.FullScreen(self.root)
 
         #self.__settingsinit__()
@@ -67,6 +85,7 @@ class Editor():
         self.Menu.add_cascade(label="Run",menu=self.RunMenu)
         self.root.config(menu=self.Menu)
         ##SUBSECTION:Menu adding:END
+        self.FolderTree = TreeviewFrame(self.root,'/')
         
         #SECTION:Main Editor
         self.MainEditorCount = 0
@@ -77,13 +96,18 @@ class Editor():
         self.MainEditor = CustomNotebook(self.RandomTabStrings,self.Pages)
         self.MainEditor.pack(expand=True,fill=BOTH)
         E = self.Pages[RandomString]  = ttk.Frame(self.MainEditor)
-        self.MainEditor.add(E, text=f"Home",image=self.MainIcon,compound="left")
+        self.MainEditor.add(E, text=f"Home",image=self.root.MainIcon,compound="left")
         ttk.Label(E,text="Press this button or open the file via the menu at the top").pack(anchor=NW,pady=10)
         ttk.Button(E,text="Open File",command=lambda:self.OpenFile()).pack(anchor=NW)
         
+        
         #SECTION:Loop
         self.root.mainloop()
-        
+    
+    def OpenFolder(self):
+        self.FolderName.set(filedialog.askdirectory(parent=self.root,title='Select a folder'))
+        self.FolderTree.LoadNewFolder(self.FolderName.get())
+    ''' 
     def Run(self):
         self.run_output = io.StringIO()
 
@@ -103,7 +127,8 @@ class Editor():
             with contextlib.redirect_stdout(self.run_output):
                 exec(resave)
             outputtext.insert(END,self.run_output.getvalue())
-    
+'''
+
     def ExtCommand(self):
         root = Toplevel()
         root.title('Run Command')
@@ -131,7 +156,7 @@ class Editor():
             self.FileName.set(filename)
             self.ImageTab()
             return
-        print(filename)
+        deprint(filename)
         self.FileName.set(filename)
         self.NewTab()
 
@@ -140,6 +165,7 @@ class Editor():
         if f is None:
             return
         self.FileName.set(f.name)
+        self.NewTab()
 
     def DeleteFileConfirm(self):
         self.deleteroot = Toplevel()
@@ -156,6 +182,16 @@ class Editor():
     
     def RandomString(self):
         return ''.join(random.choices(string.ascii_letters,k=10))
+    
+    def PopupMenu(self,event):
+        def Copy():
+            event.widget.clipboard_clear()
+            deprint(event.widget.selection_get())
+            event.widget.clipboard_append(event.widget.selection_get())
+        menu = Menu(self.root,tearoff=0)
+        menu.add_command(label="Copy",command=lambda:Copy())
+        menu.add_command(label="Warning!:Might not work")
+        menu.post(event.x_root,event.y_root)
 
     def NewTab(self):
         with open(self.FileName.get(),encoding="UTF-8") as f:
@@ -166,15 +202,14 @@ class Editor():
         self.RandomTabStrings.append(RandomString)
         E = self.Pages[RandomString]  = ttk.Frame(self.MainEditor)
         
-        self.MainEditor.add(E, text=f"{self.FileName.get().split('/')[-1]}",image=self.FileIcon,compound="left")
+        self.MainEditor.add(E, text=f"{self.FileName.get().split('/')[-1]}",image=self.root.FileIcon,compound="left")
         SVBar = Scrollbar(E)
         SVBar.pack (side = RIGHT, fill = "y")
         SHBar = Scrollbar(E, orient = HORIZONTAL)
         SHBar.pack (side = BOTTOM, fill = "x")
         Display = IDEText(E, height = 500, width = 500,yscrollcommand = SVBar.set,xscrollcommand = SHBar.set, wrap = "none")
-        SaveButton = ttk.Button(E,text='Save',command=lambda:self.Save())
-        SaveButton.pack(side=LEFT,fill=BOTH)
         Display.pack(expand = 0, fill = BOTH)
+        Display.bind("<Button-3>",lambda event:self.PopupMenu(event))
         SHBar.config(command = Display.xview)
         SVBar.config(command = Display.yview)
         quote = f"""{self.FileContent.get()}"""
@@ -189,20 +224,37 @@ class Editor():
         self.RandomTabStrings.append(RandomString)
         E = self.Pages[RandomString]  = ttk.Frame(self.MainEditor)
 
-        self.MainEditor.add(E, text=f"{self.FileName.get().split('/')[-1]}",image=self.FileIcon,compound="left") 
+        self.MainEditor.add(E, text=f"{self.FileName.get().split('/')[-1]}",image=self.root.FileIcon,compound="left") 
         #n can't be zero
         n=self.settings['ImageSize']
         image = Image.open(self.FileName.get())
-        print(image.size)
-        print(f'({E.winfo_screenwidth()},{E.winfo_screenheight()})')
+        #image = Image.open(self.settings["icon"])
+        deprint(image.size)
+        deprint(f'({E.winfo_screenwidth()},{E.winfo_screenheight()})')
         if image.size[0] * n < E.winfo_screenwidth(): 
-            print('got past step one')
+            deprint('got past step one')
             if image.size[1] * n < E.winfo_screenheight():        
                 [imageSizeWidth, imageSizeHeight] = image.size
                 newImageSizeWidth = int(imageSizeWidth*n)
                 newImageSizeHeight = int(imageSizeHeight*n) 
-                image = image.resize((newImageSizeWidth, newImageSizeHeight), Image.ANTIALIAS)
-                print(image.size)
+                image = image.resize((newImageSizeWidth, newImageSizeHeight), Image.NEAREST)
+                deprint(image.size)
+        '''
+        for frame in range(0,image.n_frames):
+            image.seek(frame)
+            n=self.settings['ImageSize']
+            image = image
+            deprint(image.size) 
+            deprint(f'({E.winfo_screenwidth()},{E.winfo_screenheight()})')
+            if image.size[0] * n < E.winfo_screenwidth(): 
+                deprint('got past step one')
+                if image.size[1] * n < E.winfo_screenheight():        
+                    [imageSizeWidth, imageSizeHeight] = image.size
+                    newImageSizeWidth = int(imageSizeWidth*n)
+                    newImageSizeHeight = int(imageSizeHeight*n) 
+                    image = image.resize((newImageSizeWidth, newImageSizeHeight), Image.ANTIALIAS)
+        '''
+    
         img = ImageTk.PhotoImage(image)
         label = Label(E, image=img,text="testing")
         label.image = img # required for image to appear
@@ -224,12 +276,9 @@ class Editor():
         self.Display.config(state=DISABLED)   
         
         
-        
-
-
 Editor()
 
 #Build with
 
-#   
+#pyinstaller --icon=icon.ico  --exclude-module "_bootlocale extensions"  "TkIDE.pyw"
 #Then use inno script installer to build the installer

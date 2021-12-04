@@ -1,7 +1,6 @@
 {
     "testfuncs":{
-        "mp4":"mp4Loader.test()",
-        "sus":"mp4Loader.AMOGNSU()"
+        "mp4":"mp4Loader.test()"
     },
     "mp4":"mp4Loader.test()"
 }

@@ -1,5 +1,5 @@
-# TkIDE  Version 1.5.7
-Next update will be 1.6.0!! 🎉
+# TkIDE  Version 1.6.0 
+<span>&#127881;<span>
 
 # Disclaimers
 - ## WARNING: TkIDE is a work in progress project. I am not responsible for any damage done to your computer.
@@ -41,25 +41,32 @@ in theme.json (Disabled by default)
 ### Disclaimer:TkIDE is <b><b>NOT</b></b> pure tkinter. There are custom classes amd in the future there may be some wxPython or PyQt
 <br>
 
+- ### Non standard module things used:
+  - Pillow
+  - Custom tkinter based widgets
+  - Custom extension loader
+  - Python-Markdown and tkinterweb to render readme in editor.
+ 
+
 also it is not an ide its just a trash code editor with a few features. 
 
 ### Info
 
 - Will try to work on load times (not happening lol)
-    > On the previous note, numba might be used in the future.
-    > On that note, I might now use pyjion as an attempt to speed it up.
+    - Working with pyinstaller not onefile mode and venvs
+    - Works, well - up to 2 times faster than the old version
 - more features - maybe?
 - Updated yearly for major updates.
--  Usually updated monthly for minor updates.
+- Usually updated monthly for minor updates.
 - The tab system is not perfect and will probably be improved in the future.
-    > If too many tabs are open the close buttons will clump togther and not work. A solution that could be implemented is to have a scrollbar for the tab system and fixing the custom tab system.
+    - If too many tabs are open the close buttons will clump togther and not work. A solution that could be implemented is to have a scrollbar for the tab system and fixing the custom tab system.
 - The syntax highlighting is not perfect and will probably be improved in the future.
-    > I need more experience with regex before I will try to fix it, - expect delay of 3 - 5 months.
+    - I need more experience with regex before I will try to fix it, - expect delay of 3 - 5 months.
 - I am working on an extension system that will allow for smaller builds.
 - I am working on a system to run python files and output them to a tkinter terminal.
-    > Note:I might  on adding the terminal as input and output for a more intergrated experience.
+  - Note:I might  on adding the terminal as input and output for a more intergrated experience.
 - Running extension commands has a simple basis for now.
-  > You can now add your own commands to the extension system via the extensions folder and commands.json. To run a command type the sections of the command in the command box separated by / and press the run button. All console related code will not work.
+  - You can now add your own commands to the extension system via the extensions folder and commands.json. To run a command type the sections of the command in the command box separated by / and press the run button. All console related code will not work.
 
 
 

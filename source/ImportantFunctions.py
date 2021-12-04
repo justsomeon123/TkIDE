@@ -1,5 +1,6 @@
 import platform
-def FullScreen(root) -> str:
+import tkinter as tk
+def FullScreen(root):
     x = platform.system()
     if x == "Windows":
         root.state('zoomed')
