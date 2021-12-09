@@ -1,1 +1,4 @@
-print(6 / 2*(1 + 2))
+import time
+for i in range(10000):
+    print(i+1)
+    time.sleep(0.1)

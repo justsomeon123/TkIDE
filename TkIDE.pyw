@@ -11,6 +11,7 @@ from typing import Union
 from source.CustomClasses import *
 #Make sure pil is always after any modules with a class called Image or ImageTk
 from PIL import Image, ImageTk
+
 def deprint(text,debug=False):
     if debug:
         print(text)
