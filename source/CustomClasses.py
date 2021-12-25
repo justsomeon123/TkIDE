@@ -1,4 +1,5 @@
-from tkinter import Text,Label,Scrollbar,IntVar,Frame,LEFT,RIGHT,Y,NW,NE,BOTH,font,ttk,PhotoImage,Canvas,END
+from tkinter import Text,Tk,Label,Scrollbar,IntVar,Frame,LEFT,RIGHT,Y,NW,NE,BOTH,font,ttk,PhotoImage,Canvas,END #end is used in highlighting
+import os,keyword
 class IDEText(Text):
     '''A text widget with a new method, highlight_pattern()
 
@@ -157,39 +158,78 @@ class CustomNotebook(ttk.Notebook):
     ])
 
 
-class Scrollable(Frame):
-    """
-       Make a frame scrollable with scrollbar on the right.
-       After adding or removing widgets to the scrollable frame,
-       call the update() method to refresh the scrollable area.
-    """
+class TreeviewFrame(object):
+    def __init__(self, master, path):
+        self.nodes = dict()
+        frame = Frame(master)
+        self.tree = ttk.Treeview(frame)
+        ysb = ttk.Scrollbar(frame, orient='vertical', command=self.tree.yview)
+        xsb = ttk.Scrollbar(frame, orient='horizontal', command=self.tree.xview)
+        self.tree.configure(yscroll=ysb.set, xscroll=xsb.set)
+        self.tree.heading('#0', text='', anchor='w')
 
-    def __init__(self, frame, width=16):
+        ysb.pack(side='right', fill='y')
+        xsb.pack(side='bottom', fill='x')
+        self.tree.pack(side=LEFT, fill=BOTH)
+        frame.pack(side=LEFT, fill=Y)
 
-        scrollbar = Scrollbar(frame, width=width)
-        scrollbar.pack(side=RIGHT, fill=Y, expand=False)
+        abspath = os.path.abspath(path)
+        self.insert_node('', abspath, abspath)
+        self.tree.bind('<<TreeviewOpen>>', self.open_node)
+        ttk.Sizegrip(self.tree).place(relx=1.0, rely=1.0, anchor='se')
+        
+    def LoadNewFolder(self,path):
+        abspath = os.path.abspath(path)
+        self.tree.delete(*self.tree.get_children())
+        self.insert_node('', abspath, abspath)
+        
+        
+    
+    def insert_node(self, parent, text, abspath):
+        node = self.tree.insert(parent, 'end', text=text, open=False)
+        if os.path.isdir(abspath):
+            self.nodes[node] = abspath
+            self.tree.insert(node, 'end')
 
-        self.canvas = Canvas(frame, yscrollcommand=scrollbar.set)
-        self.canvas.pack(side=LEFT, fill=BOTH, expand=True)
+    def open_node(self, event):
+        node = self.tree.focus()
+        abspath = self.nodes.pop(node, None)
+        if abspath:
+            self.tree.delete(self.tree.get_children(node))
+            for p in os.listdir(abspath):
+                self.tree.bind("<<TreeviewSelect>>", self.print_element)
+                self.insert_node(node, p, os.path.join(abspath, p))
+    
+    def print_element(self,event):
+        tree = event.widget
+        selection = [tree.item(item)["abspath"] for item in tree.selection()]
+        print("selected items:", selection)
 
-        scrollbar.config(command=self.canvas.yview)
+def PythonHighlight(Display:IDEText,HighlightThemes):
+    tags = list(HighlightThemes)
+    for tag in tags:
+        Display.tag_remove(tag,1.0,END)
 
-        self.canvas.bind('<Configure>', self.__fill_canvas)
+    Display.tag_configure('default',foreground=HighlightThemes["default"])
+    Display.tag_configure("intger",foreground=HighlightThemes["intger"])
+    Display.tag_configure("string",foreground=HighlightThemes["string"])
+    Display.tag_configure("keyword",foreground=HighlightThemes["keyword"])
+    Display.tag_configure("comment",foreground=HighlightThemes["comment"])
 
-        # base class initialization
-        Frame.__init__(self, frame)
+    #adding tags to text
 
-        # assign this obj (the inner frame) to the windows item of the canvas
-        self.windows_item = self.canvas.create_window(0,0, window=self, anchor=NW)
+    #default
+    pythonkeywords =  keyword.kwlist
+    for i in pythonkeywords:
+        i = ' ' + i + ' '
+        Display.highlight_pattern(i,"keyword")
+        i = ' ' + i + ':'
+        Display.highlight_pattern(i,"keyword")
 
+    #intgers
+    for i in [1,2,3,4,5,6,7,8,9,0]:
+        Display.highlight_pattern(str(i),"intger")
 
-    def __fill_canvas(self, event):
-        "Enlarge the windows item to the canvas width"
-
-        canvas_width = event.width
-        self.canvas.itemconfig(self.windows_item, width = canvas_width)
-
-    def update(self):
-        "Update the canvas and the scrollregion"
-
-        self.update_idletasks()
+    #strings with regexp
+    Display.highlight_pattern(r'"(.*?)\"',"string",regexp=True)
+    Display.highlight_pattern(r"'(.*?)\'","string",regexp=True)

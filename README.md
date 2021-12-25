@@ -1,11 +1,26 @@
-# TkIDE  Version 1.5.7
-Next update will be 1.6.0!! 🎉
-
+# TkIDE  Version 1.6.1 :tada:
+Merry Christmas! :christmas_tree: :tada:
 # Disclaimers
 - ## WARNING: TkIDE is a work in progress project. I am not responsible for any damage done to your computer.
 ## Included features
 
 
+## Changes
+- ## 1.6.1
+- Fixed major saving and loading file bugs.
+- Fixed bug where the file would not be saved.
+- Fixed bug with no icon, removed splash screen.
+- Better Performance and smaller size
+- Working on extension api
+- removed old extension api
+- ## Version 1.6.0
+- New folder view + shortcut to open folder
+- Added new loading screen - ![Loading Screen](assets/LoadingEx.jpg)
+- Performance improvements
+- Improved extension system - new api for extensions
+- Removed Run command aka disabled it.
+<br>
+## Included features
 ### All new syntax highlighting 
 - Disabled by default - go to theme.json and copy values in "old" and put that into the main part json
 - strings are less laggy and should now work properly
@@ -34,7 +49,8 @@ in theme.json (Disabled by default)
 
 <br>
 
-### 
+## Issues
+- 
 
 ## Important Things
 
