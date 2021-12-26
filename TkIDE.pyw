@@ -1,9 +1,9 @@
-#Version:1.6.0
+#Version:1.6.1 Last Updated:2021-12-25
 #Look at README.md for more information
 #############################################################################################
 #TkIDE.pyw
 
-import string,random,os,source.ImportantFunctions,json, source.SyntaxHighlighting,imghdr,source.SplashScreen
+import string,random,os,source.ImportantFunctions,json,imghdr
 from extensions import * #import all extensions
 from extensions import LoadExtensionPt
 from tkinter import ttk,filedialog,Text,Tk,StringVar,Menu,Toplevel,Button,BOTTOM,END,HORIZONTAL,DISABLED,Entry,CURRENT
@@ -83,7 +83,8 @@ class Editor():
         self.RandomTabStrings.append(RandomString)
         self.MainEditor = CustomNotebook(self.RandomTabStrings,self.Pages)
         self.MainEditor.pack(expand=True,fill=BOTH)
-        E = self.Pages[RandomString]  = ttk.Frame(self.MainEditor)
+        self.Pages[RandomString]  = (ttk.Frame(self.MainEditor),self.FileName.get())
+        E = self.Pages[RandomString][0]
         self.MainEditor.add(E, text=f"Home",image=self.root.MainIcon,compound="left")
         ttk.Label(E,text="Press this button or open the file via the menu at the top").pack(anchor=NW,pady=10)
         ttk.Button(E,text="Open File",command=lambda:self.OpenFile()).pack(anchor=NW)
@@ -95,27 +96,14 @@ class Editor():
     def OpenFolder(self):
         self.FolderName.set(filedialog.askdirectory(parent=self.root,title='Select a folder'))
         self.FolderTree.LoadNewFolder(self.FolderName.get())
-    ''' 
+    
     def Run(self):
-        self.run_output = io.StringIO()
+        root = Toplevel()
+        root.title('Run')
+        text = Text(root)
+        text.pack(expand=True,fill=BOTH)
+        text.insert(END,"NOT USED:NO FUNCTIONALITY YET")    
 
-        index = self.MainEditor.index(CURRENT)
-        RandomString = self.RandomTabStrings[index]
-        Frame = self.Pages[RandomString]
-        children = Frame.winfo_children()
-        for child in children:
-            if type(child) in [IDEText,Text]:
-                self.Display = child
-        with open(self.FileName.get(),'r') as f:
-            resave = self.Display.get('1.0','end-1c')
-            root = Toplevel()
-            root.title(f'Run Output:{self.FileName.get()}')
-            outputtext = Text(root,width=100,height=20)
-            outputtext.pack(expand=True,fill=BOTH)
-            with contextlib.redirect_stdout(self.run_output):
-                exec(resave)
-            outputtext.insert(END,self.run_output.getvalue())
-'''
 
     def ExtCommand(self):
         root = Toplevel()
@@ -128,12 +116,12 @@ class Editor():
     def Save(self):
         index = self.MainEditor.index(CURRENT)
         RandomString = self.RandomTabStrings[index]
-        Frame = self.Pages[RandomString]
+        Frame = self.Pages[RandomString][0]
         children = Frame.winfo_children()
         for child in children:
             if type(child) in [IDEText,Text]:
                 self.Display = child
-        with open(self.FileName.get(),'r+') as f:
+        with open(self.Pages[RandomString][1],'r+') as f:
             resave = self.Display.get('1.0','end-1c')
             f.truncate()
             f.write(resave)
@@ -188,8 +176,8 @@ class Editor():
         self.MainEditorCount += 1
         RandomString = self.RandomString()
         self.RandomTabStrings.append(RandomString)
-        E = self.Pages[RandomString]  = ttk.Frame(self.MainEditor)
-        
+        self.Pages[RandomString]  = (ttk.Frame(self.MainEditor),self.FileName.get())
+        E = self.Pages[RandomString][0]        
         self.MainEditor.add(E, text=f"{self.FileName.get().split('/')[-1]}",image=self.root.FileIcon,compound="left")
         SVBar = Scrollbar(E)
         SVBar.pack (side = RIGHT, fill = "y")
@@ -203,15 +191,15 @@ class Editor():
         quote = f"""{self.FileContent.get()}"""
         Display.insert(END, quote)
         #Higlighting
-        self.ReHighlight(Display)
-        self.root.bind("<KeyPress>",lambda event: self.ReHighlight(Display))
+        PythonHighlight(Display,self.HighlightThemes)
+        self.root.bind("<KeyPress>",lambda event: PythonHighlight(Display,self.HighlightThemes))
     
     def ImageTab(self):
         self.MainEditorCount += 1
         RandomString = self.RandomString()
         self.RandomTabStrings.append(RandomString)
-        E = self.Pages[RandomString]  = ttk.Frame(self.MainEditor)
-
+        self.Pages[RandomString]  = (ttk.Frame(self.MainEditor),self.FileName.get())
+        E = self.Pages[RandomString][0]
         self.MainEditor.add(E, text=f"{self.FileName.get().split('/')[-1]}",image=self.root.FileIcon,compound="left") 
         #n can't be zero
         n=self.settings['ImageSize']
@@ -256,9 +244,6 @@ class Editor():
         return c 
     
 
-    
-    def ReHighlight(self,Display:Union[IDEText,Text]):
-        source.SyntaxHighlighting.PythonHighlight(Display,self.HighlightThemes)
 
     def ReadOnlyFile(self):
         self.Display.config(state=DISABLED)   

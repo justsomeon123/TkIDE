@@ -1,4 +1,4 @@
-# TkIDE  Version 1.6.0 :tada:
+# TkIDE  Version 1.6.1 :tada:
 Merry Christmas! :christmas_tree: :tada:
 # Disclaimers
 - ## WARNING: TkIDE is a work in progress project. I am not responsible for any damage done to your computer.
@@ -8,6 +8,11 @@ Merry Christmas! :christmas_tree: :tada:
 
 
 ## Changes
+- ## Version 1.6.1
+- Reenabled run function - NO functionality
+- Fixed major saving and loading bug
+- Optimized code
+- Working on extension api - old one removed.
 - ## Version 1.6.0
 - New folder view + shortcut to open folder
 - Added new loading screen - ![Loading Screen](assets/LoadingEx.jpg)
