@@ -253,5 +253,5 @@ Editor()
 
 #Build with
 
-#pyinstaller --icon=icon.ico  --exclude-module "_bootlocale extensions"  "TkIDE.pyw"
+#pyinstaller --icon=icon.ico  --exclude-module "_bootlocale"  "TkIDE.pyw"
 #Then use inno script installer to build the installer
