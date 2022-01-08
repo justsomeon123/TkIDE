@@ -1,4 +1,4 @@
-#Version:1.6.1 Last Updated:2021-12-25
+#Version:1.6.1 Last Updated:2021-12-31
 #Look at README.md for more information
 #############################################################################################
 #TkIDE.pyw
@@ -6,8 +6,7 @@
 import string,random,os,source.ImportantFunctions,json,imghdr
 from extensions import * #import all extensions
 from extensions import LoadExtensionPt
-from tkinter import ttk,filedialog,Text,Tk,StringVar,Menu,Toplevel,Button,BOTTOM,END,HORIZONTAL,DISABLED,Entry,CURRENT
-from typing import Union
+from tkinter import ttk,filedialog,Text,Tk,StringVar,Menu,Toplevel,Button,BOTTOM,END,HORIZONTAL,Entry,CURRENT
 from source.CustomClasses import *
 #Make sure pil is always after any modules with a class called Image or ImageTk
 from PIL import Image, ImageTk
@@ -88,6 +87,9 @@ class Editor():
         self.MainEditor.add(E, text=f"Home",image=self.root.MainIcon,compound="left")
         ttk.Label(E,text="Press this button or open the file via the menu at the top").pack(anchor=NW,pady=10)
         ttk.Button(E,text="Open File",command=lambda:self.OpenFile()).pack(anchor=NW)
+        ttk.Button(E,text="Create a New File",command=lambda:self.CreateFile()).pack(anchor=NW)
+        ttk.Button(E,text="Open Folder",command=lambda:self.OpenFolder()).pack(anchor=NW)
+        ttk.Button(E,text="Delete a File",command=lambda:self.DeleteFileConfirm()).pack(anchor=NW)
         
         
         #SECTION:Loop
@@ -242,16 +244,11 @@ class Editor():
         e = file.split('.')
         c = e[-1]
         return c 
-    
 
-
-    def ReadOnlyFile(self):
-        self.Display.config(state=DISABLED)   
-        
         
 Editor()
 
 #Build with
-
 #pyinstaller --icon=icon.ico  --exclude-module "_bootlocale"  "TkIDE.pyw"
+
 #Then use inno script installer to build the installer

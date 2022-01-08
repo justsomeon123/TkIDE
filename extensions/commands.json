@@ -1,6 +1,6 @@
 {
     "testfuncs":{
-        "mp4":"mp4Loader.test()"
+        "mp3":"mp3Loader.test()"
     },
-    "mp4":"mp4Loader.test()"
+    "mp3":"mp3Loader.app()"
 }

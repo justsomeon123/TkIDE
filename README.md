@@ -1,13 +1,23 @@
-# TkIDE  Version 1.6.1 :tada:
-Merry Christmas! :christmas_tree: :tada:
+# TkIDE  Version 1.6.2.
+Happy New Year! :star: :tada:
 # Disclaimers
 - ## WARNING: TkIDE is a work in progress project. I am not responsible for any damage done to your computer.
 
 - ## TkIDE is not an actual IDE. It is a code editor with limited functionality.
+- ## All extensions have to be bundled/packages with required dependncies,
+- ## I AM NOT RESPONSIBLE FOR YOU GETTING SUED 
 
 
 
 ## Changes
+- ## Version 1.6.2
+- Removed venv folder because i don't want to get sued
+- All extensions have to be bundled/packages with required dependncies,I AM NOT RESPONSIBLE FOR YOU GETTING SUED
+- removed clunk in exe
+- Pushed extension api back for a while,probably will arrive Feb ~ May
+- > ## mp3loader (Formerly mp4loader) 
+- Renamed to mp3loader (extension functions/commands renamed appropriately)
+- adding mp3 functionality
 - ## Version 1.6.1
 - Reenabled run function - NO functionality
 - Fixed major saving and loading bug
