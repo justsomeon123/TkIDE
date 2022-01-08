@@ -9,9 +9,9 @@
 /TkIDE  
 /.vscode
 #hide distbrution
+
 /dist/TkIDE
-/dist/TkIDE_Setup.exe
 *.iss
-
-
-Gif-Test.gif
+desktop.ini
+sauce.com
+/TkIDE
