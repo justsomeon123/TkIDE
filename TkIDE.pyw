@@ -1,4 +1,4 @@
-#Version:1.6.1 Last Updated:2021-12-31
+#Version:1.6.2 Last Updated:2022-1-10
 #Look at README.md for more information
 #############################################################################################
 #TkIDE.pyw
