@@ -1,8 +1,13 @@
-import os
+import os,sys
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import filedialog
-import pygame.mixer as music
+import os, sys
+with open(os.devnull, 'w') as f:
+    oldstdout = sys.stdout
+    sys.stdout = f
+    import pygame.mixer as music
+    sys.stdout = oldstdout
 from mutagen.mp3 import MP3
 from extensions.stdlibrary import changedir
 music.init()
