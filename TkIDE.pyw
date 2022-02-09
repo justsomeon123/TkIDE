@@ -1,4 +1,4 @@
-#Version:1.6.2 Last Updated:2022-1-10
+#Version:1.6.2 Last Updated:2022-1-13 
 #Look at README.md for more information
 #############################################################################################
 #TkIDE.pyw
@@ -14,9 +14,7 @@ from PIL import Image, ImageTk
 def deprint(text,debug=False):
     if debug:
         print(text)
-
-
-class Editor():
+class Editor:
     def __init__(self) -> None:
         #SECTION:Setup
         self.root = Tk()
@@ -24,7 +22,7 @@ class Editor():
         with open('./assets/settings.json') as f:
             self.settings = json.load(f)
         with open(self.settings["EditorColors"]) as f:
-            self.HighlightThemes:dict = json.load(f)
+            self.HighlightThemes = json.load(f)
 
                 
         self.FileName = StringVar()

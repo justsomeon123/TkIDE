@@ -1,3 +1,6 @@
+#Most of the code here is from stackoverflow but modified to fit my needs.
+
+
 from tkinter import Text,Tk,Label,Scrollbar,IntVar,Frame,LEFT,RIGHT,Y,NW,NE,BOTH,font,ttk,PhotoImage,Canvas,END #end is used in highlighting
 import os,keyword
 class IDEText(Text):
