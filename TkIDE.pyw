@@ -1,10 +1,11 @@
-#Version:1.6.2 Last Updated:2022-1-13 
+#Version:1.6.3 Last Updated:2022-1-26 
 #Look at README.md for more information
 #############################################################################################
 #TkIDE.pyw
 
-import string,random,os,source.ImportantFunctions,json,imghdr
-from extensions import * #import all extensions
+import string,random,os,source.ImportantFunctions,json,imghdr,sys
+from threading import Thread
+import extensions  #import all extensions
 from extensions import LoadExtensionPt
 from tkinter import ttk,filedialog,Text,Tk,StringVar,Menu,Toplevel,Button,BOTTOM,END,HORIZONTAL,Entry,CURRENT
 from source.CustomClasses import *
@@ -15,7 +16,7 @@ def deprint(text,debug=False):
     if debug:
         print(text)
 class Editor:
-    def __init__(self) -> None:
+    def __init__(self,aexlsup) -> None:
         #SECTION:Setup
         self.root = Tk()
 
@@ -201,21 +202,24 @@ class Editor:
         self.Pages[RandomString]  = (ttk.Frame(self.MainEditor),self.FileName.get())
         E = self.Pages[RandomString][0]
         self.MainEditor.add(E, text=f"{self.FileName.get().split('/')[-1]}",image=self.root.FileIcon,compound="left") 
-        #n can't be zero
+        #@ ^ Handles creating a tab for the image holder.
+
+        #WARN n can't be zero
+        
+        #@ Handles resizing the image until it fits inside without being too big.
         n=self.settings['ImageSize']
         image = Image.open(self.FileName.get())
-        #image = Image.open(self.settings["icon"])
-        deprint(image.size)
-        deprint(f'({E.winfo_screenwidth()},{E.winfo_screenheight()})')
         if image.size[0] * n < E.winfo_screenwidth(): 
-            deprint('got past step one')
             if image.size[1] * n < E.winfo_screenheight():        
                 [imageSizeWidth, imageSizeHeight] = image.size
                 newImageSizeWidth = int(imageSizeWidth*n)
                 newImageSizeHeight = int(imageSizeHeight*n) 
                 image = image.resize((newImageSizeWidth, newImageSizeHeight), Image.NEAREST)
-                deprint(image.size)
-        '''
+
+
+
+        #! NOT WORKING, DEPRECATED CODE FOR FRAMES
+        ''' 
         for frame in range(0,image.n_frames):
             image.seek(frame)
             n=self.settings['ImageSize']
@@ -231,21 +235,30 @@ class Editor:
                     image = image.resize((newImageSizeWidth, newImageSizeHeight), Image.ANTIALIAS)
         '''
     
+        #@ ^ Handles packing and showing the image in the screen.
         img = ImageTk.PhotoImage(image)
-        label = Label(E, image=img,text="testing")
+        label = Label(E, image=img,text="Image not supported/NotLoaded")
         label.image = img # required for image to appear
         label.pack()
 
         
-
+    #! not used, yet ;)
     def _findfiletype(self,file:str):
         e = file.split('.')
         c = e[-1]
         return c 
+    
 
-        
-Editor()
 
+if __name__ == "__main__":
+    if sys.argv.__len__() < 2: 
+        Editor(None)
+    elif sys.argv.__len__() >= 2:
+        #checks for extension mode and then launches the chosen extension and the the editor
+        if sys.argv[1] == '-e':
+            x = sys.argv[2]
+            Editor(LoadExtensionPt([x],True))
+            
 #Build with
 #pyinstaller --icon=icon.ico  --exclude-module "_bootlocale"  "TkIDE.pyw"
 

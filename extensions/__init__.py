@@ -1,6 +1,12 @@
-from os.path import dirname, basename, isfile, join
-import glob,json
-def LoadExtensionPt(sections:list):
+from os.path import dirname, basename, join
+import glob,json,importlib
+
+def LoadExtensionPt(sections:list,command:bool=False):
+    if command:
+        print("mp3Loader.py initizalized and working")
+        sections.insert(0,"command")
+    else:pass
+    
     if len(sections) == 0:
         return
     if len(sections) == 1:
@@ -23,9 +29,18 @@ def LoadExtensionPt(sections:list):
         exec("exec(commands[section][subsection][subsection1][subsection2])")
     else:return
     
-modules = glob.glob(join(dirname(__file__), "*.py"))
-__all__ = [basename(f)[:-3] for f in modules if isfile(f) and not f.endswith('__init__.py')]
-#print(__all__)
+modules = glob.glob(join(dirname(__file__), "**/*.py"),recursive=True)
+__all__ = []
+for module in modules:
+    
+    if basename(module) == "__init__.py":
+        continue
+    module = module.removeprefix(dirname(__file__)).replace("\\",".").removeprefix(".").removesuffix(".py")
+    __all__.append(module)
+    x = "extensions."+module
+    importlib.__import__(x)
+
+print(__all__)
 commands = json.load(open("extensions/commands.json"))
 #print(commands)
 
