@@ -1,5 +1,5 @@
-# TkIDE  Version 1.6.2.
-Happy New Year! :star: :tada:
+# TkIDE  Version 1.7.0.
+Happy Pi Day! π
 # Disclaimers
 - ## WARNING: TkIDE is a work in progress project. I am not responsible for any damage done to your computer.
 
@@ -10,6 +10,11 @@ Happy New Year! :star: :tada:
 
 
 ## Changes
+- ## Version 1.7.0
+- Finally added decent extension support!
+- mp3loader now functions as an extension, and plays music!
+
+
 - ## Version 1.6.2
 - Removed venv folder because i don't want to get sued
 - All extensions have to be bundled/packages with required dependncies,I AM NOT RESPONSIBLE FOR YOU GETTING SUED
