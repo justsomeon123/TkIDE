@@ -3,12 +3,14 @@
 
 from tkinter import Text,Tk,Label,Scrollbar,IntVar,Frame,LEFT,RIGHT,Y,NW,NE,BOTH,font,ttk,PhotoImage,Canvas,END #end is used in highlighting
 import os,keyword
+
+#Adapted from https://stackoverflow.com/questions/3781670/how-to-highlight-text-in-a-tkinter-text-widget?rq=1
 class IDEText(Text):
     '''A text widget with a new method, highlight_pattern()
 
     example:
 
-    text = CustomText()
+    text = IDEText()
     text.tag_configure("red", foreground="#ff0000")
     text.highlight_pattern("this should be red", "red")
 
@@ -17,6 +19,7 @@ class IDEText(Text):
     '''
     def __init__(self, *args, **kwargs):
         Text.__init__(self, *args, **kwargs)
+
 
     def highlight_pattern(self, pattern, tag, start="1.0", end="end",
                           regexp=False):
@@ -43,6 +46,7 @@ class IDEText(Text):
             self.tag_add(tag, "matchStart", "matchEnd")
 
 
+#Adapted from https://stackoverflow.com/questions/39458337/is-there-a-way-to-add-close-buttons-to-tabs-in-tkinter-ttk-notebook
     
 class CustomNotebook(ttk.Notebook):
     """A ttk Notebook with close buttons on each tab"""
@@ -208,31 +212,4 @@ class TreeviewFrame(object):
         selection = [tree.item(item)["abspath"] for item in tree.selection()]
         print("selected items:", selection)
 
-def PythonHighlight(Display:IDEText,HighlightThemes):
-    tags = list(HighlightThemes)
-    for tag in tags:
-        Display.tag_remove(tag,1.0,END)
 
-    Display.tag_configure('default',foreground=HighlightThemes["default"])
-    Display.tag_configure("intger",foreground=HighlightThemes["intger"])
-    Display.tag_configure("string",foreground=HighlightThemes["string"])
-    Display.tag_configure("keyword",foreground=HighlightThemes["keyword"])
-    Display.tag_configure("comment",foreground=HighlightThemes["comment"])
-
-    #adding tags to text
-
-    #default
-    pythonkeywords =  keyword.kwlist
-    for i in pythonkeywords:
-        i = ' ' + i + ' '
-        Display.highlight_pattern(i,"keyword")
-        i = ' ' + i + ':'
-        Display.highlight_pattern(i,"keyword")
-
-    #intgers
-    for i in [1,2,3,4,5,6,7,8,9,0]:
-        Display.highlight_pattern(str(i),"intger")
-
-    #strings with regexp
-    Display.highlight_pattern(r'"(.*?)\"',"string",regexp=True)
-    Display.highlight_pattern(r"'(.*?)\'","string",regexp=True)

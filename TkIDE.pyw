@@ -1,9 +1,10 @@
-#Version:1.7.0 Last Updated:2022-3-14 
+#Version:1.7.1 Last Updated:2022-3-24
 #Look at README.md for more information
 #############################################################################################
 #TkIDE.pyw
 
-import string,random,os,source.ImportantFunctions,json,imghdr,sys
+import string,random,os,source.ImportantFunctions,json,imghdr,sys,pygame,mutagen
+
 from threading import Thread
 import extensions  #import all extensions
 from extensions import LoadExtensionPt
@@ -15,6 +16,7 @@ from PIL import Image, ImageTk
 def deprint(text,debug=False):
     if debug:
         print(text)
+        
 class Editor:
     def __init__(self,aexlsup) -> None:
         #SECTION:Setup
@@ -119,9 +121,11 @@ class Editor:
         RandomString = self.RandomTabStrings[index]
         Frame = self.Pages[RandomString][0]
         children = Frame.winfo_children()
+
         for child in children:
-            if type(child) in [IDEText,Text]:
+            if type(child) == IDEText:
                 self.Display = child
+
         with open(self.Pages[RandomString][1],'r+') as f:
             resave = self.Display.get('1.0','end-1c')
             f.truncate()
@@ -191,9 +195,10 @@ class Editor:
         SVBar.config(command = Display.yview)
         quote = f"""{self.FileContent.get()}"""
         Display.insert(END, quote)
-        #Higlighting
-        PythonHighlight(Display,self.HighlightThemes)
-        self.root.bind("<KeyPress>",lambda event: PythonHighlight(Display,self.HighlightThemes))
+        
+        #@ Higlighting Code
+        source.ImportantFunctions.PythonHighlight(Display,self.HighlightThemes)
+        self.root.bind("<KeyPress>",lambda event: source.ImportantFunctions.PythonHighlight(Display,self.HighlightThemes))
     
     def ImageTab(self):
         self.MainEditorCount += 1
@@ -202,18 +207,18 @@ class Editor:
         self.Pages[RandomString]  = (ttk.Frame(self.MainEditor),self.FileName.get())
         E = self.Pages[RandomString][0]
         self.MainEditor.add(E, text=f"{self.FileName.get().split('/')[-1]}",image=self.root.FileIcon,compound="left") 
-        #@ ^ Handles creating a tab for the image holder.
+        #@ ^  creating a tab for the image holder.
 
-        #WARN n can't be zero
+        #WARN size can't be zero
         
-        #@ Handles resizing the image until it fits inside without being too big.
-        n=self.settings['ImageSize']
+        #@ v resize the image until it fits inside without being too big.
+        size=self.settings['ImageScaleSize']
         image = Image.open(self.FileName.get())
-        if image.size[0] * n < E.winfo_screenwidth(): 
-            if image.size[1] * n < E.winfo_screenheight():        
+        if image.size[0] * size < E.winfo_screenwidth(): 
+            if image.size[1] * size < E.winfo_screenheight():        
                 [imageSizeWidth, imageSizeHeight] = image.size
-                newImageSizeWidth = int(imageSizeWidth*n)
-                newImageSizeHeight = int(imageSizeHeight*n) 
+                newImageSizeWidth = int(imageSizeWidth*size)
+                newImageSizeHeight = int(imageSizeHeight*size) 
                 image = image.resize((newImageSizeWidth, newImageSizeHeight), Image.NEAREST)
 
 
@@ -260,6 +265,6 @@ if __name__ == "__main__":
             Editor(LoadExtensionPt([x],True))
             
 #Build with
-#pyinstaller --icon=icon.ico  --exclude-module "_bootlocale"  "TkIDE.pyw"
+#pyinstaller TkIDE.spec
 
 #Then use inno script installer to build the installer

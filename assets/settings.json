@@ -2,13 +2,6 @@
     "icon":"./assets/icon.png",
     "file-icon":"./assets/file.png",
     "EditorColors":"./assets/theme.json",
-    "DefaultFont":"./assets/fonts/Open_Sans/OpenSans-Light.ttf",
-    "NotifyOnSave":true,
-    "ImageSize":8,
-    "SyntaxItems":  
-    {
-        "Python":
-        {
-        }
-    }
+    "ImageScaleSize":8
+
 }

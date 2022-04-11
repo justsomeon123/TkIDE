@@ -1,14 +1,16 @@
 {
     "default":"#124333",
-    "intger":"#124333",
-    "string":"#124333",
-    "keyword":"#124333",
-    "comment":"#124333",
+    "intger":"#ff0000",
+    "string":"#29a64b",
+    "keyword":"#db6516",
+    "comment":"#4b4d4a",
+    "operator":"#ff0000",
     "old":{
         "default":"#124333",
         "intger":"#ff0000",
         "string":"#29a64b",
         "keyword":"#db6516",
-        "comment":"#4b4d4a"
+        "comment":"#4b4d4a",
+        "operator":"#ff0000"
     }
 }

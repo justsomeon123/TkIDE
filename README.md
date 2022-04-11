@@ -1,18 +1,28 @@
-# TkIDE  Version 1.7.0.
-Happy Pi Day! π
+# TkIDE  Version 1.7.1.
+ 
 # Disclaimers
 - ## WARNING: TkIDE is a work in progress project. I am not responsible for any damage done to your computer.
+- ## **Beware!**
+  - ### **TkIDE** could be closed at any time.
 
 - ## TkIDE is not an actual IDE. It is a code editor with limited functionality.
-- ## All extensions have to be bundled/packages with required dependncies,
+- ## All extensions have to be bundled/packaged with required dependncies,
+- ### TkIDE raw only works with Python 3.9 and above.
 - ## I AM NOT RESPONSIBLE FOR YOU GETTING SUED 
 
 
 
-## Changes
+## Changes  
+
+- ## 1.7.1
+- Improved highlighting, aka use of [Pygments](https://pygments.org/).
+- Fixed a bug where the editor would not start, because of the way extensions are loaded.
+- Added more syntax highlighting for python, so be happy:D
+
 - ## Version 1.7.0
 - Finally added decent extension support!
 - mp3loader now functions as an extension, and plays music!
+- Huge changes in the back end
 
 
 - ## Version 1.6.2
@@ -51,26 +61,24 @@ Happy Pi Day! π
 - Ctrl+E : Run extension command
 ### settings.json and theme.json
 - choose the app icon
-- choose the theme file (Disabled by default)
+- choose the theme file 
 - choose the default font (NOT USED)
 - add the syntax items (NOT USED)
 - change syntax
-<span style="color:red">c</span>
-<span style="color:orange">o</span>
-<span style="color:yellow">l</span> 
-<span style="color:green">o</span>
-<span style="color:blue">r</span>
-<span style="color:purple">s</span>
+<span style="color:red">c</span><span style="color:orange">o</span><span style="color:yellow">l</span><span style="color:green">o</span><span style="color:blue">r</span><span style="color:purple">s</span> :rainbow: 
+
+
+
 in theme.json (Disabled by default)
 
 <br>
 
 ## Issues
-- Due to the splash screen the app icon is not visible.
+- Extensions don't run 
 
 ## Important Things
 
-### Disclaimer:TkIDE is <b><b>NOT</b></b> pure tkinter. There are custom classes amd in the future there may be some wxPython or PyQt
+### Disclaimer:TkIDE is <b><b>NOT</b></b> pure tkinter. There are custom classes and in the future there may be some wxPython or PyQt
 <br>
 
 - ### Non standard libarary things used:
@@ -106,6 +114,3 @@ in theme.json (Disabled by default)
   - You can now add your own commands to the extension system via the extensions folder and commands.json. To run a command type the sections of the command in the command box separated by / and press the run button. All console input/output related code will not work.
 
 
-
-## **Beware!**
-- ### **TkIDE** could be closed at any time.
