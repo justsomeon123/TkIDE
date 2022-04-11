@@ -240,18 +240,13 @@ class Editor:
                     image = image.resize((newImageSizeWidth, newImageSizeHeight), Image.ANTIALIAS)
         '''
     
-        #@ ^ Handles packing and showing the image in the screen.
+        #@ Handles packing and showing the image in the screen.
         img = ImageTk.PhotoImage(image)
         label = Label(E, image=img,text="Image not supported/NotLoaded")
         label.image = img # required for image to appear
         label.pack()
 
         
-    #! not used, yet ;)
-    def _findfiletype(self,file:str):
-        e = file.split('.')
-        c = e[-1]
-        return c 
     
 
 
