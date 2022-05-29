@@ -2,7 +2,7 @@
 
 
 from tkinter import Text,Tk,Label,Scrollbar,IntVar,Frame,LEFT,RIGHT,Y,NW,NE,BOTH,font,ttk,PhotoImage,Canvas,END #end is used in highlighting
-import os,keyword
+import os
 
 #Adapted from https://stackoverflow.com/questions/3781670/how-to-highlight-text-in-a-tkinter-text-widget?rq=1
 class IDEText(Text):
@@ -17,8 +17,11 @@ class IDEText(Text):
     The highlight_pattern method is a simplified python
     version of the tcl code at http://wiki.tcl.tk/3246
     '''
-    def __init__(self, *args, **kwargs):
+    def __init__(self,*args, **kwargs):
+        self.filename = kwargs["filename"] #ger the filename from the kwargs for pygments highlighting
+        kwargs.pop("filename") # Make sure Text init doesn't get filename as an option
         Text.__init__(self, *args, **kwargs)
+        
 
 
     def highlight_pattern(self, pattern, tag, start="1.0", end="end",

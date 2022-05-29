@@ -1,11 +1,11 @@
-#Version:1.7.1 Last Updated:2022-3-24
+#INFO Version:1.7.1 Last Updated:2022-04-12
 #Look at README.md for more information
 #############################################################################################
 #TkIDE.pyw
 
 import string,random,os,source.ImportantFunctions,json,imghdr,sys,pygame,mutagen
 
-from threading import Thread
+import threading as thread 
 import extensions  #import all extensions
 from extensions import LoadExtensionPt
 from tkinter import ttk,filedialog,Text,Tk,StringVar,Menu,Toplevel,Button,BOTTOM,END,HORIZONTAL,Entry,CURRENT
@@ -34,8 +34,11 @@ class Editor:
         self.FolderName = StringVar()
         self.FolderName.set('Open a Folder')
 
+        #SECTION:Icons
         self.root.MainIcon = ImageTk.PhotoImage(Image.open(self.settings["icon"]),Image.NEAREST)
         self.root.FileIcon = ImageTk.PhotoImage(Image.open(self.settings["file-icon"]),Image.NEAREST)
+
+        #SECTION:Shortcuts
         self.root.bind('<Control-o>',lambda event:self.OpenFile())
         self.root.bind('<Control-s>',lambda event:self.Save())
         self.root.bind('<Control-n>',lambda event:self.CreateFile())
@@ -113,7 +116,14 @@ class Editor:
         root.title('Run Command')
         command = StringVar()
         Entry(root,textvariable=command).pack(expand=True,fill=BOTH)
-        Button(root,text='Run Provided Command',command=lambda:LoadExtensionPt(command.get().split("/"))).pack(side=BOTTOM)
+        Button(root,text='Run Provided Command',command=lambda:self.iel(root,command.get().split("/"))).pack(side=BOTTOM)
+
+    def iel(self,root,sections):
+        try:
+            LoadExtensionPt(sections,False)
+            root.destroy()
+        except KeyError:
+            pass
 
     #SECTION:SAVE   
     def Save(self):
@@ -188,17 +198,17 @@ class Editor:
         SVBar.pack (side = RIGHT, fill = "y")
         SHBar = Scrollbar(E, orient = HORIZONTAL)
         SHBar.pack (side = BOTTOM, fill = "x")
-        Display = IDEText(E, height = 500, width = 500,yscrollcommand = SVBar.set,xscrollcommand = SHBar.set, wrap = "none")
+        deprint(self.FileName.get(),True)
+        Display = IDEText(E,filename=self.FileName.get(),height = 500, width = 500,yscrollcommand = SVBar.set,xscrollcommand = SHBar.set, wrap = "none")
         Display.pack(expand = 0, fill = BOTH)
         Display.bind("<Button-3>",lambda event:self.PopupMenu(event))
         SHBar.config(command = Display.xview)
         SVBar.config(command = Display.yview)
-        quote = f"""{self.FileContent.get()}"""
-        Display.insert(END, quote)
+        Display.insert(END,  f"""{self.FileContent.get()}""")
         
         #@ Higlighting Code
-        source.ImportantFunctions.PythonHighlight(Display,self.HighlightThemes)
-        self.root.bind("<KeyPress>",lambda event: source.ImportantFunctions.PythonHighlight(Display,self.HighlightThemes))
+        source.ImportantFunctions.PythonHighlight(Display)
+        self.root.bind("<KeyPressed>",lambda event: source.ImportantFunctions.PythonHighlight(Display))
     
     def ImageTab(self):
         self.MainEditorCount += 1
@@ -242,8 +252,8 @@ class Editor:
     
         #@ Handles packing and showing the image in the screen.
         img = ImageTk.PhotoImage(image)
-        label = Label(E, image=img,text="Image not supported/NotLoaded")
-        label.image = img # required for image to appear
+        label = Label(E, image=img,text="Image not supported/not Loaded")
+        label.image = img #WARN required for image to appear
         label.pack()
 
         
@@ -254,12 +264,12 @@ if __name__ == "__main__":
     if sys.argv.__len__() < 2: 
         Editor(None)
     elif sys.argv.__len__() >= 2:
-        #checks for extension mode and then launches the chosen extension and the the editor
+        #@ checks for extension mode and then launches the chosen extension and the the editor
         if sys.argv[1] == '-e':
             x = sys.argv[2]
             Editor(LoadExtensionPt([x],True))
             
-#Build with
-#pyinstaller TkIDE.spec
+#*Build with
+#*pyinstaller TkIDE.pyw -F -w -i icon.ico -n TkIDE  
 
-#Then use inno script installer to build the installer
+#*Then use inno script installer to build the installer
