@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-import os
+import os,importlib
 
 @contextmanager
 def changedir(newdir):
@@ -9,3 +9,4 @@ def changedir(newdir):
         yield
     finally:
         os.chdir(prevdir)
+

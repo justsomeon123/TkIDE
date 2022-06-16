@@ -1,4 +1,4 @@
-#Example extension, follow the same format, using a class, __name__ == "__main__", and always make sure gui apps use a 
+# Example extension, follow the same format, using a class, __name__ == "__main__", and always make sure gui apps use a 
 # command argument and also, pygame and mutagen are included with the compile of the exe, for other extensions, 
 # you will need to put them in as folders, MAKE SURE TO CHECK WITH THE CREATORS OF THE EXTERNAL MODULES YOU ARE USING 
 #

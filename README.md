@@ -1,6 +1,5 @@
 # TkIDE  Version 1.7.1.
 # I am taking a break from the project. I'm 13, i dont have the time to manage a project this big. 
-# adios amigos
 # Disclaimers
 - ## WARNING: TkIDE is a work in progress project. I am not responsible for any damage done to your computer.
 - ## **Beware!**
