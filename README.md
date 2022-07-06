@@ -39,6 +39,7 @@
 - Fixed major saving and loading bug
 - Optimized code
 - Working on extension api - old one removed.
+- Removed loading screen.
 - ## Version 1.6.0
 - New folder view + shortcut to open folder
 - Added new loading screen - ![Loading Screen](assets/LoadingEx.jpg)
@@ -47,10 +48,8 @@
 - Removed Run command aka disabled it.
 <br>
 ## Included features
-### All new syntax highlighting 
-- Disabled by default - go to theme.json and copy values in "old" and put that into the main part of the json
-- strings are less laggy and should now work properly
-- soon to come - actual differentiating between file types for better highlighting
+### All new syntax highlighting (Pygments)
+- Faster than the older regex-based syntax highlighting
 
 ### KeyBinds for more functionalty with files.
 - Ctrl+S : Save File 
@@ -58,14 +57,9 @@
 - Ctrl+N : New File
 - Ctrl+D : Delete File
 - Ctrl+R : Run a python file (Doesn't do anything)
-### settings.json and theme.json
-- choose the app icon
-- choose the theme file 
-- choose the default font (NOT USED)
-
-
-
-in theme.json (Disabled by default)
+### settings.json
+- choose the app and file icon
+- Select image scaling size
 
 <br>
 
@@ -77,7 +71,7 @@ in theme.json (Disabled by default)
 ### Disclaimer:TkIDE is <b><b>NOT</b></b> pure tkinter. There are custom classes and in the future there may be some wxPython or PyQt
 <br>
 
-- ### Non standard libarary things used:
+- ### Non standard library things used:
   - Pillow
   - Custom tkinter based widgets
   - Pygments
