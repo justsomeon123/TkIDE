@@ -1,13 +1,9 @@
-#INFO Version:1.7.1 Last Updated:2022-04-12
+#INFO Version:2.0 Last Updated:2022-07-5
 #Look at README.md for more information
 #############################################################################################
 #TkIDE.pyw
 
-import string,random,os,source.ImportantFunctions,json,imghdr,sys,pygame,mutagen
-
-import threading as thread 
-import extensions  #import all extensions
-from extensions import LoadExtensionPt
+import string,random,os,source.ImportantFunctions,json,imghdr
 from tkinter import ttk,filedialog,Text,Tk,StringVar,Menu,Toplevel,Button,BOTTOM,END,HORIZONTAL,Entry,CURRENT
 from source.CustomClasses import *
 #Make sure pil is always after any modules with a class called Image or ImageTk
@@ -18,21 +14,17 @@ def deprint(text,debug=False):
         print(text)
         
 class Editor:
-    def __init__(self,aexlsup) -> None:
+    def __init__(self) -> None:
         #SECTION:Setup
         self.root = Tk()
 
         with open('./assets/settings.json') as f:
             self.settings = json.load(f)
-        with open(self.settings["EditorColors"]) as f:
-            self.HighlightThemes = json.load(f)
 
                 
         self.FileName = StringVar()
         self.FileName.set('')
         self.FileContent = StringVar()
-        self.FolderName = StringVar()
-        self.FolderName.set('Open a Folder')
 
         #SECTION:Icons
         self.root.MainIcon = ImageTk.PhotoImage(Image.open(self.settings["icon"]),Image.NEAREST)
@@ -44,14 +36,12 @@ class Editor:
         self.root.bind('<Control-n>',lambda event:self.CreateFile())
         self.root.bind('<Control-d>',lambda event:self.DeleteFileConfirm())
         self.root.bind('<Control-r>',lambda event:self.Run())
-        self.root.bind('<Control-k>',lambda event:self.OpenFolder())
-        self.root.bind('<Control-e>',lambda event:self.ExtCommand())
 
 
         
 
         #SECTION:Root Management        
-        self.root.iconphoto(True,self.root.MainIcon)
+        self.root.iconphoto(True,self.root.MainIcon)    
         self.root.title('TkIDE')
         source.ImportantFunctions.FullScreen(self.root)
 
@@ -69,14 +59,12 @@ class Editor:
         ##SUBSECTION:Run Menu
         self.RunMenu = Menu(self.Menu,tearoff=0)
         self.RunMenu.add_command(label='Run (PYTHON ONLY)',command=lambda:self.Run())
-        self.RunMenu.add_command(label='Run extension command',command=lambda:self.ExtCommand())
         ##SUBSECTION:Run Menu:END
         ##SUBSECTION:Menu adding
         self.Menu.add_cascade(label="File",menu=self.FileMenu)
         self.Menu.add_cascade(label="Run",menu=self.RunMenu)
         self.root.config(menu=self.Menu)
         ##SUBSECTION:Menu adding:END
-        self.FolderTree = TreeviewFrame(self.root,'/')
         
         #SECTION:Main Editor
         self.MainEditorCount = 0
@@ -89,19 +77,15 @@ class Editor:
         self.Pages[RandomString]  = (ttk.Frame(self.MainEditor),self.FileName.get())
         E = self.Pages[RandomString][0]
         self.MainEditor.add(E, text=f"Home",image=self.root.MainIcon,compound="left")
-        ttk.Label(E,text="Press this button or open the file via the menu at the top").pack(anchor=NW,pady=10)
+        ttk.Label(E,text="Press these buttons or use the menu at the top").pack(anchor=NW,pady=10)
         ttk.Button(E,text="Open File",command=lambda:self.OpenFile()).pack(anchor=NW)
         ttk.Button(E,text="Create a New File",command=lambda:self.CreateFile()).pack(anchor=NW)
-        ttk.Button(E,text="Open Folder",command=lambda:self.OpenFolder()).pack(anchor=NW)
         ttk.Button(E,text="Delete a File",command=lambda:self.DeleteFileConfirm()).pack(anchor=NW)
         
         
         #SECTION:Loop
         self.root.mainloop()
     
-    def OpenFolder(self):
-        self.FolderName.set(filedialog.askdirectory(parent=self.root,title='Select a folder'))
-        self.FolderTree.LoadNewFolder(self.FolderName.get())
     
     def Run(self):
         root = Toplevel()
@@ -118,12 +102,6 @@ class Editor:
         Entry(root,textvariable=command).pack(expand=True,fill=BOTH)
         Button(root,text='Run Provided Command',command=lambda:self.iel(root,command.get().split("/"))).pack(side=BOTTOM)
 
-    def iel(self,root,sections):
-        try:
-            LoadExtensionPt(sections,False)
-            root.destroy()
-        except KeyError:
-            pass
 
     #SECTION:SAVE   
     def Save(self):
@@ -207,8 +185,8 @@ class Editor:
         Display.insert(END,  f"""{self.FileContent.get()}""")
         
         #@ Higlighting Code
-        source.ImportantFunctions.PythonHighlight(Display)
-        self.root.bind("<KeyPressed>",lambda event: source.ImportantFunctions.PythonHighlight(Display))
+        source.ImportantFunctions.highlight(Display)
+        self.root.bind("<KeyPress>",lambda event: source.ImportantFunctions.highlight(Display))
     
     def ImageTab(self):
         self.MainEditorCount += 1
@@ -233,7 +211,7 @@ class Editor:
 
 
 
-        #! NOT WORKING, DEPRECATED CODE FOR FRAMES
+        #! v NOT WORKING CODE FOR GIFS
         ''' 
         for frame in range(0,image.n_frames):
             image.seek(frame)
@@ -261,15 +239,9 @@ class Editor:
 
 
 if __name__ == "__main__":
-    if sys.argv.__len__() < 2: 
-        Editor(None)
-    elif sys.argv.__len__() >= 2:
-        #@ checks for extension mode and then launches the chosen extension and the the editor
-        if sys.argv[1] == '-e':
-            x = sys.argv[2]
-            Editor(LoadExtensionPt([x],True))
+    Editor()
             
 #*Build with
 #*pyinstaller TkIDE.pyw -F -w -i icon.ico -n TkIDE  
 
-#*Then use inno script installer to build the installer
+#*Then use inno script installer to create the installer

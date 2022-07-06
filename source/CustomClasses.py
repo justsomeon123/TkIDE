@@ -21,32 +21,20 @@ class IDEText(Text):
         self.filename = kwargs["filename"] #ger the filename from the kwargs for pygments highlighting
         kwargs.pop("filename") # Make sure Text init doesn't get filename as an option
         Text.__init__(self, *args, **kwargs)
-        
+        self.tag_configure("Token.Keyword", foreground="#CC7A00")
+        self.tag_configure("Token.Keyword.Constant", foreground="#CC7A00")
+        self.tag_configure("Token.Keyword.Declaration", foreground="#CC7A00")
+        self.tag_configure("Token.Keyword.Namespace", foreground="#CC7A00")
+        self.tag_configure("Token.Keyword.Pseudo", foreground="#CC7A00")
+        self.tag_configure("Token.Keyword.Reserved", foreground="#CC7A00")
+        self.tag_configure("Token.Keyword.Type", foreground="#CC7A00")
+        self.tag_configure("Token.Name.Class", foreground="#003D99")
+        self.tag_configure("Token.Name.Exception", foreground="#003D99")
+        self.tag_configure("Token.Name.Function", foreground="#003D99")
+        self.tag_configure("Token.Operator.Word", foreground="#CC7A00")
+        self.tag_configure("Token.Comment", foreground="#B80000")
+        self.tag_configure("Token.Literal.String", foreground="#248F24")
 
-
-    def highlight_pattern(self, pattern, tag, start="1.0", end="end",
-                          regexp=False):
-        '''Apply the given tag to all text that matches the given pattern
-
-        If 'regexp' is set to True, pattern will be treated as a regular
-        expression according to Tcl's regular expression syntax.
-        '''
-
-        start = self.index(start)
-        end = self.index(end)
-        self.mark_set("matchStart", start)
-        self.mark_set("matchEnd", start)
-        self.mark_set("searchLimit", end)
-
-        count = IntVar()
-        while True:
-            index = self.search(pattern, "matchEnd","searchLimit",
-                                count=count, regexp=regexp)
-            if index == "": break
-            if count.get() == 0: break # degenerate pattern which matches zero-length strings
-            self.mark_set("matchStart", index)
-            self.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
-            self.tag_add(tag, "matchStart", "matchEnd")
 
 
 #Adapted from https://stackoverflow.com/questions/39458337/is-there-a-way-to-add-close-buttons-to-tabs-in-tkinter-ttk-notebook
@@ -166,53 +154,3 @@ class CustomNotebook(ttk.Notebook):
             ]
         })
     ])
-
-
-class TreeviewFrame(object):
-    def __init__(self, master, path):
-        self.nodes = dict()
-        frame = Frame(master)
-        self.tree = ttk.Treeview(frame)
-        ysb = ttk.Scrollbar(frame, orient='vertical', command=self.tree.yview)
-        xsb = ttk.Scrollbar(frame, orient='horizontal', command=self.tree.xview)
-        self.tree.configure(yscroll=ysb.set, xscroll=xsb.set)
-        self.tree.heading('#0', text='', anchor='w')
-
-        ysb.pack(side='right', fill='y')
-        xsb.pack(side='bottom', fill='x')
-        self.tree.pack(side=LEFT, fill=BOTH)
-        frame.pack(side=LEFT, fill=Y)
-
-        abspath = os.path.abspath(path)
-        self.insert_node('', abspath, abspath)
-        self.tree.bind('<<TreeviewOpen>>', self.open_node)
-        ttk.Sizegrip(self.tree).place(relx=1.0, rely=1.0, anchor='se')
-        
-    def LoadNewFolder(self,path):
-        abspath = os.path.abspath(path)
-        self.tree.delete(*self.tree.get_children())
-        self.insert_node('', abspath, abspath)
-        
-        
-    
-    def insert_node(self, parent, text, abspath):
-        node = self.tree.insert(parent, 'end', text=text, open=False)
-        if os.path.isdir(abspath):
-            self.nodes[node] = abspath
-            self.tree.insert(node, 'end')
-
-    def open_node(self, event):
-        node = self.tree.focus()
-        abspath = self.nodes.pop(node, None)
-        if abspath:
-            self.tree.delete(self.tree.get_children(node))
-            for p in os.listdir(abspath):
-                self.tree.bind("<<TreeviewSelect>>", self.print_element)
-                self.insert_node(node, p, os.path.join(abspath, p))
-    
-    def print_element(self,event):
-        tree = event.widget
-        selection = [tree.item(item)["abspath"] for item in tree.selection()]
-        print("selected items:", selection)
-
-

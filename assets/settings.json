@@ -1,7 +1,6 @@
 {
     "icon":"./assets/icon.png",
     "file-icon":"./assets/file.png",
-    "EditorColors":"./assets/theme.json",
     "ImageScaleSize":8
 
 }

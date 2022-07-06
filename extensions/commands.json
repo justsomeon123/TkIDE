@@ -1,9 +1,0 @@
-{
-    "test":{
-        "mp3":"mp3.mp3Loader.test()"
-    },
-    "mp3":"mp3.mp3Loader.app()",
-    "command":{
-        "mp3":"mp3.mp3Loader.app(True)"
-    }
-}

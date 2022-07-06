@@ -1,24 +1,24 @@
-# TkIDE  Version 1.7.1.
-# I am taking a break from the project. I'm 13, i dont have the time to manage a project this big. 
-# adios amigos
+# TkIDE  Version 2.0 
+
+
 # Disclaimers
-- ## WARNING: TkIDE is a work in progress project. I am not responsible for any damage done to your computer.
+- ## **WARNING**: TkIDE is a work in progress project. I am not responsible for any damage done to your computer.
+
 - ## **Beware!**
   - ### **TkIDE** could be closed at any time.
 
 - ## TkIDE is not an actual IDE. It is a code editor with limited functionality.
-- ## All extensions have to be bundled/packaged with required dependncies,
-- ### TkIDE raw only works with Python 3.9 and above.
-- ## I AM NOT RESPONSIBLE FOR YOU GETTING SUED 
 
+
+- ### TkIDE's raw code only works with Python 3.9 and above.
 
 
 ## Changes  
 
-- ## 1.7.1
+- ## 2.0
 - Improved highlighting, aka use of [Pygments](https://pygments.org/).
-- Fixed a bug where the editor would not start, because of the way extensions are loaded.
-- Added more syntax highlighting for python, so be happy:D
+- Removed extensions. They were too much of a hassle, and were too hard for me to get to work. So, as of now, there will be no extensions. In the future there may be extension support, but for now, it will not exist.
+- Removed tree view. It was hard too work on, and there were too many problems with it.
 
 - ## Version 1.7.0
 - Finally added decent extension support!
@@ -27,8 +27,8 @@
 
 
 - ## Version 1.6.2
-- Removed venv folder because i don't want to get sued
-- All extensions have to be bundled/packages with required dependncies,I AM NOT RESPONSIBLE FOR YOU GETTING SUED
+- Removed venv folder 
+- All extensions have to be bundled/packages with required dependncies
 - removed clunk in exe
 - Pushed extension api back for a while,probably will arrive Feb ~ May
 - > ## mp3loader (Formerly mp4loader) 
@@ -57,16 +57,11 @@
 - Ctrl+O : Open File
 - Ctrl+N : New File
 - Ctrl+D : Delete File
-- Ctrl+R : Run a python file (disabled and unable to be re-enabled for now)
-- Ctrl+K : Open folder in treeview
-- Ctrl+E : Run extension command
+- Ctrl+R : Run a python file (Doesn't do anything)
 ### settings.json and theme.json
 - choose the app icon
 - choose the theme file 
 - choose the default font (NOT USED)
-- add the syntax items (NOT USED)
-- change syntax
-<span style="color:red">c</span><span style="color:orange">o</span><span style="color:yellow">l</span><span style="color:green">o</span><span style="color:blue">r</span><span style="color:purple">s</span> :rainbow: 
 
 
 
@@ -75,7 +70,7 @@ in theme.json (Disabled by default)
 <br>
 
 ## Issues
-- Extensions don't run 
+- Highlighting is not working properly. 
 
 ## Important Things
 
@@ -85,7 +80,7 @@ in theme.json (Disabled by default)
 - ### Non standard libarary things used:
   - Pillow
   - Custom tkinter based widgets
-  - Custom extension loader
+  - Pygments
   
 
 ### Info
@@ -94,24 +89,11 @@ in theme.json (Disabled by default)
     - Working with pyinstaller not onefile mode and venvs
     - Works, well - up to 2 times faster than the old version
 - more features - maybe?
-- Updated yearly for major updates.
-- Usually updated monthly for minor updates.
 
-- The tab system is not perfect and will probably be improved in the future.
+- The tab system ~~is not perfect~~ trash and will probably be improved in the future.
 
     - If too many tabs are open the close buttons will clump togther and not work. A solution that could be implemented is to have a scrollbar for the tab system and fixing the custom tab system.
 
-- The syntax highlighting is not perfect and will probably be improved in the future.
-
-    - I need more experience with regex before I will try to fix it, - expect delay of 3 - 5 months.
-
-- I am working on an extension system that will allow for smaller builds.
-
 - I am working on a system to run python files and output them to a tkinter terminal.
 
-  - Note:I might  on adding the terminal as input and output for a more intergrated experience.
-
-- Running extension commands has a simple basis for now.
-  - You can now add your own commands to the extension system via the extensions folder and commands.json. To run a command type the sections of the command in the command box separated by / and press the run button. All console input/output related code will not work.
-
-
+  - Note:I might add the terminal as part of the ide, instead of a new window 
