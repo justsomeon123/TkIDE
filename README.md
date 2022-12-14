@@ -1,4 +1,4 @@
-# TkIDE  Version 2.0 
+# TkIDE  Version 1.7.2
 
 
 # Disclaimers
@@ -15,10 +15,11 @@
 
 ## Changes  
 
-- ## 2.0
-- Improved highlighting, aka use of [Pygments](https://pygments.org/).
+- ## 1.7.2
+- Worked more on syntax highlighting with [Pygments](https://pygments.org/).
+- Fixed deprecation issues with Pillow NEAREST, and imgdhr.
 - Removed extensions. They were too much of a hassle, and were too hard for me to get to work. So, as of now, there will be no extensions. In the future there may be extension support, but for now, it will not exist.
-- Removed tree view. It was hard too work on, and there were too many problems with it.
+- Removed tree file view. It was hard too work on, and there were too many problems with it.
 
 - ## Version 1.7.0
 - Finally added decent extension support!
