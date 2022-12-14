@@ -4,19 +4,9 @@
 from tkinter import Text,Tk,Label,Scrollbar,IntVar,Frame,LEFT,RIGHT,Y,NW,NE,BOTH,font,ttk,PhotoImage,Canvas,END #end is used in highlighting
 import os
 
-#Adapted from https://stackoverflow.com/questions/3781670/how-to-highlight-text-in-a-tkinter-text-widget?rq=1
+#Adapted from https://stackoverflow.com/questions/3781670/how-to-highlight-text-in-a-tkinter-text-widget?rq=1 and https://stackoverflow.com/questions/32058760/improve-pygments-syntax-highlighting-speed-for-tkinter-text
 class IDEText(Text):
-    '''A text widget with a new method, highlight_pattern()
 
-    example:
-
-    text = IDEText()
-    text.tag_configure("red", foreground="#ff0000")
-    text.highlight_pattern("this should be red", "red")
-
-    The highlight_pattern method is a simplified python
-    version of the tcl code at http://wiki.tcl.tk/3246
-    '''
     def __init__(self,*args, **kwargs):
         self.filename = kwargs["filename"] #ger the filename from the kwargs for pygments highlighting
         kwargs.pop("filename") # Make sure Text init doesn't get filename as an option
@@ -33,8 +23,8 @@ class IDEText(Text):
         self.tag_configure("Token.Name.Function", foreground="#003D99")
         self.tag_configure("Token.Operator.Word", foreground="#CC7A00")
         self.tag_configure("Token.Comment", foreground="#B80000")
-        self.tag_configure("Token.Literal.String", foreground="#248F24")
-
+        self.tag_configure("Token.String", foreground="#248F24")
+        self.tag_configure("Token.Number", foreground="#fc8c03")
 
 
 #Adapted from https://stackoverflow.com/questions/39458337/is-there-a-way-to-add-close-buttons-to-tabs-in-tkinter-ttk-notebook

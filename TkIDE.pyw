@@ -4,7 +4,8 @@
 #TkIDE.pyw
 
 import string,random,os,source.ImportantFunctions,json,imghdr
-from tkinter import ttk,filedialog,Text,Tk,StringVar,Menu,Toplevel,Button,BOTTOM,END,HORIZONTAL,Entry,CURRENT
+import tkinter
+from tkinter import Event, ttk,filedialog,Text,Tk,StringVar,Menu,Toplevel,Button,BOTTOM,END,HORIZONTAL,Entry,CURRENT
 from source.CustomClasses import *
 #Make sure pil is always after any modules with a class called Image or ImageTk
 from PIL import Image, ImageTk
@@ -150,22 +151,31 @@ class Editor:
         self.deleteroot.destroy()
     
     def RandomString(self):
-        return ''.join(random.choices(string.ascii_letters,k=10))
+        return ''.join(random.choices(string.ascii_letters,k=10)) #1/141167095653376 chance to be g 
     
-    def PopupMenu(self,event):
+    def PopupMenu(self,event:Event):
         def Copy():
             event.widget.clipboard_clear()
             deprint(event.widget.selection_get())
             event.widget.clipboard_append(event.widget.selection_get())
+        
+        def Cut():
+            event.widget.clipboard_clear()
+            deprint(event.widget.selection_get())
+            event.widget.selection_
+            event.widget.clipboard_append(event.widget.selection_get())
+
         menu = Menu(self.root,tearoff=0)
         menu.add_command(label="Copy",command=lambda:Copy())
-        menu.add_command(label="Warning!:Might not work")
+        menu.add_command(label="Cut",command=lambda:Cut())
+        menu.add_command(label="Warning: Might not work")
         menu.post(event.x_root,event.y_root)
 
     def NewTab(self):
         with open(self.FileName.get(),encoding="UTF-8") as f:
             self.FileContent.set(f.read())
         
+        #@ I don't even know. This code is unreadable. Please send help.
         self.MainEditorCount += 1
         RandomString = self.RandomString()
         self.RandomTabStrings.append(RandomString)

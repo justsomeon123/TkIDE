@@ -4,7 +4,7 @@ from pygments import lex
 import pygments.lexers as lexers
 
 
-#taken and adapted from stackoverflow
+#adapted from stackoverflow https://stackoverflow.com/questions/32058760/improve-pygments-syntax-highlighting-speed-for-tkinter-text
 def highlight(Display:IDEText):
     Display.content = Display.get("1.0", END)
     Display.lines = Display.content.split("\n")
@@ -26,10 +26,10 @@ def highlight(Display:IDEText):
 
 
 def FullScreen(root) -> None: 
-    x = platform.system()
-    if x == "Windows" or "OSX":
+    os = platform.system()
+    if os == "Windows" or "OSX":
         root.state('zoomed')
-    if x == "Linux":
+    if os == "Linux":
         root.attributes('-zoomed', True)
     else:
         return None
