@@ -254,4 +254,4 @@ if __name__ == "__main__":
 #*Build with
 #*pyinstaller TkIDE.pyw -F -w -i icon.ico -n TkIDE  
 
-#*Then use inno script installer to create the installer
+#*Then use inno script installer to build the installer
