@@ -6,23 +6,20 @@ import pygments.lexers as lexers
 
 #adapted from stackoverflow https://stackoverflow.com/questions/32058760/improve-pygments-syntax-highlighting-speed-for-tkinter-text
 def highlight(Display:IDEText):
-    Display.content = Display.get("1.0", END)
-    Display.lines = Display.content.split("\n")
-    Display.previousContent = ""
-    
-    lexer = lexers.get_lexer_for_filename(Display.filename)
+    Display.mark_set("range_start", "1.0")
+    _lex = lexers.get_lexer_for_filename(Display.filename)
 
-    if (Display.previousContent != Display.content):
-        Display.row = Display.index("insert").split(".")[0]
-        Display.mark_set("range_start", Display.row + ".0")
-        data = Display.get(Display.row + ".0", Display.row + "." + str(len(Display.lines[int(Display.row) - 1])))
+    data = Display.get(Display.index("insert").split(".")[0]+".0",Display.index("insert").split(".")[0]+".end")
+    for token, content in lex(data,_lex):
+        try:
+            print(token)
+            start = Display.search(content,Display.index("insert").split(".")[0]+".0",Display.index("insert").split(".")[0]+".end")
+            end = start.split(".")[0] + "." + str(int(start.split(".")[1]) + len(content))
+            print(f"{start},{end}")
 
-        for token, content in lex(data, lexer):
-            Display.mark_set("range_end", "range_start + %dc" % len(content))
-            Display.tag_add(str(token), "range_start", "range_end")
-            Display.mark_set("range_start", "range_end")
-
-    Display.previousContent = Display.get("1.0", END)
+            Display.tag_add(str(token), start, end)
+        except Exception:
+            pass
 
 
 def FullScreen(root) -> None: 

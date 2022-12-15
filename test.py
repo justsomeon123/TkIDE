@@ -5,9 +5,10 @@ from pygments.lexers import PythonLexer
 
 #slightly adapted from stackoverflow (lost the link) to test
 
-root = tkinter.Tk("how are you")
+root = tkinter.Tk()
 textPad = ScrolledText.ScrolledText(root, width=100, height=80)
-textPad.tag_configure("Token.Comment", foreground="#aaaaaa")
+textPad.tag_configure("Token.Comment.Single", foreground="#aaaaaa")
+textPad.tag_configure("Token.Literal.Number.Inteer", foreground="#aaaaaa")
 code = textPad.get("1.0", "end-1c")
 mylexer69420 = PythonLexer()
 
@@ -18,9 +19,8 @@ def syn(event=None):
 
     data = textPad.get(textPad.index("insert").split(".")[0]+".0",textPad.index("insert").split(".")[0]+".end")
     for token, content in lex(data,mylexer69420):
-        end = f"{start.split('.')[0]}.{int(start.split('.')[1]) + len(content)}"
-        textPad.tag_add(str(token), start, end)
-        start = end
+        print(token)
+        textPad.tag_add(str(token), textPad.index("insert").split(".")[0]+".0",textPad.index("insert").split(".")[0]+".end")
 
 textPad.pack()
 root.bind("<KeyRelease>", syn)

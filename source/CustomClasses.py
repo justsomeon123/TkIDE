@@ -21,10 +21,11 @@ class IDEText(Text):
         self.tag_configure("Token.Name.Class", foreground="#003D99")
         self.tag_configure("Token.Name.Exception", foreground="#003D99")
         self.tag_configure("Token.Name.Function", foreground="#003D99")
-        self.tag_configure("Token.Operator.Word", foreground="#CC7A00")
-        self.tag_configure("Token.Comment", foreground="#B80000")
-        self.tag_configure("Token.String", foreground="#248F24")
-        self.tag_configure("Token.Number", foreground="#fc8c03")
+        self.tag_configure("Token.Operator", foreground="#CC7A00")
+        self.tag_configure("Token.Literal.String.Single", foreground="#248F24")
+        self.tag_configure("Token.Literal.Number.Integer", foreground="#fc8c03")
+        self.tag_configure("Token.Comment.Single", foreground="#bbbbbb")
+        self.tag_configure("Token.Literal.Boolean", foreground="#a3F133")
 
 
 #Adapted from https://stackoverflow.com/questions/39458337/is-there-a-way-to-add-close-buttons-to-tabs-in-tkinter-ttk-notebook

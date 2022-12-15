@@ -1,6 +1,6 @@
 {
     "icon":"./assets/icon.png",
     "file-icon":"./assets/file.png",
+    "image-icon":"./assets/image.png",
     "ImageScaleSize":8
-
 }

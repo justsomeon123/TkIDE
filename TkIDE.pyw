@@ -3,7 +3,7 @@
 #############################################################################################
 #TkIDE.pyw
 
-import string,random,os,source.ImportantFunctions,json,imghdr
+import string,random,os,source.ImportantFunctions,json
 import tkinter
 from tkinter import Event, ttk,filedialog,Text,Tk,StringVar,Menu,Toplevel,Button,BOTTOM,END,HORIZONTAL,Entry,CURRENT
 from source.CustomClasses import *
@@ -28,8 +28,9 @@ class Editor:
         self.FileContent = StringVar()
 
         #SECTION:Icons
-        self.root.MainIcon = ImageTk.PhotoImage(Image.open(self.settings["icon"]),Image.NEAREST)
-        self.root.FileIcon = ImageTk.PhotoImage(Image.open(self.settings["file-icon"]),Image.NEAREST)
+        self.root.MainIcon = ImageTk.PhotoImage(Image.open(self.settings["icon"]),Image.Resampling.NEAREST)
+        self.root.FileIcon = ImageTk.PhotoImage(Image.open(self.settings["file-icon"]),Image.Resampling.NEAREST)
+        self.root.ImageIcon = ImageTk.PhotoImage(Image.open(self.settings["image-icon"]),Image.Resampling.NEAREST)
 
         #SECTION:Shortcuts
         self.root.bind('<Control-o>',lambda event:self.OpenFile())
@@ -122,7 +123,7 @@ class Editor:
 
     def OpenFile(self):
         filename = filedialog.askopenfilename(initialdir = '/',title = "Choose a file to edit",)
-        if imghdr.what(filename) in ["png","gif","jpg","jpeg","ico"]:
+        if filename.endswith(("png","gif","jpg","jpeg","ico")):
             self.FileName.set(filename)
             self.ImageTab()
             return
@@ -196,7 +197,7 @@ class Editor:
         
         #@ Higlighting Code
         source.ImportantFunctions.highlight(Display)
-        self.root.bind("<KeyPress>",lambda event: source.ImportantFunctions.highlight(Display))
+        self.root.bind("<KeyRelease>",lambda event: source.ImportantFunctions.highlight(Display))
     
     def ImageTab(self):
         self.MainEditorCount += 1
@@ -204,7 +205,7 @@ class Editor:
         self.RandomTabStrings.append(RandomString)
         self.Pages[RandomString]  = (ttk.Frame(self.MainEditor),self.FileName.get())
         E = self.Pages[RandomString][0]
-        self.MainEditor.add(E, text=f"{self.FileName.get().split('/')[-1]}",image=self.root.FileIcon,compound="left") 
+        self.MainEditor.add(E, text=f"{self.FileName.get().split('/')[-1]}",image=self.root.ImageIcon,compound="left") 
         #@ ^  creating a tab for the image holder.
 
         #WARN size can't be zero
@@ -217,7 +218,7 @@ class Editor:
                 [imageSizeWidth, imageSizeHeight] = image.size
                 newImageSizeWidth = int(imageSizeWidth*size)
                 newImageSizeHeight = int(imageSizeHeight*size) 
-                image = image.resize((newImageSizeWidth, newImageSizeHeight), Image.NEAREST)
+                image = image.resize((newImageSizeWidth, newImageSizeHeight), Image.Resampling.NEAREST)
 
 
 

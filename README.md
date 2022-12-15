@@ -1,5 +1,9 @@
-# TkIDE  Version 1.7.2
+# TkIDE  Version 1.8
 
+### Merry Christmas! :christmas_tree: :santa:
+
+### that goal is coming fast...
+<br>
 
 # Disclaimers
 - ## **WARNING**: TkIDE is a work in progress project. I am not responsible for any damage done to your computer.
@@ -14,6 +18,11 @@
 
 
 ## Changes  
+
+- ## 1.8
+- Finally actually added the syntax highlighting, tested with Python. Problem is it doesn't work properly, as I haven't added all the color rules.
+- Added Image Icon, and actually fixed the deprecation issues, which i left untouched last version.
+- Optimized the syntax highlighting.
 
 - ## 1.7.2
 - Worked more on syntax highlighting with [Pygments](https://pygments.org/).
