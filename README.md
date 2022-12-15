@@ -7,7 +7,7 @@
 
 # Disclaimers
 - ## **WARNING**: TkIDE is a work in progress project. I am not responsible for any damage done to your computer.
-
+- ## This version was not checked in exe form, and not built in exe form.
 - ## **Beware!**
   - ### **TkIDE** could be closed at any time.
 
