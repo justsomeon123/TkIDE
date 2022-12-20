@@ -5,7 +5,9 @@ from pygments.lexers import PythonLexer
 
 #slightly adapted from stackoverflow (lost the link) to test
 
+#create the window
 root = tkinter.Tk()
+#create the textbox
 textPad = ScrolledText.ScrolledText(root, width=100, height=80)
 textPad.tag_configure("Token.Comment.Single", foreground="#aaaaaa")
 textPad.tag_configure("Token.Literal.Number.Inteer", foreground="#aaaaaa")

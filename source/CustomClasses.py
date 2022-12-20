@@ -4,7 +4,7 @@
 from tkinter import Text,Tk,Label,Scrollbar,IntVar,Frame,LEFT,RIGHT,Y,NW,NE,BOTH,font,ttk,PhotoImage,Canvas,END #end is used in highlighting
 import os
 
-#Adapted from https://stackoverflow.com/questions/3781670/how-to-highlight-text-in-a-tkinter-text-widget?rq=1 and https://stackoverflow.com/questions/32058760/improve-pygments-syntax-highlighting-speed-for-tkinter-text
+#Adapted from https://stackoverflow.com/questions/3781670/how-to-highlight-text-in-a-tkinter-text-widget?rq=1, https://stackoverflow.com/questions/32058760/improve-pygments-syntax-highlighting-speed-for-tkinter-text
 class IDEText(Text):
 
     def __init__(self,*args, **kwargs):
@@ -27,9 +27,13 @@ class IDEText(Text):
         self.tag_configure("Token.Comment.Single", foreground="#bbbbbb")
         self.tag_configure("Token.Literal.Boolean", foreground="#a3F133")
 
+#for the first time, i am going to start this withot stackoverflow
+
+
+
 
 #Adapted from https://stackoverflow.com/questions/39458337/is-there-a-way-to-add-close-buttons-to-tabs-in-tkinter-ttk-notebook
-    
+
 class CustomNotebook(ttk.Notebook):
     """A ttk Notebook with close buttons on each tab"""
 

@@ -163,13 +163,23 @@ class Editor:
         def Cut():
             event.widget.clipboard_clear()
             deprint(event.widget.selection_get())
-            event.widget.selection_
+            event.widget.delete("sel.first","sel.last")
             event.widget.clipboard_append(event.widget.selection_get())
+        
+        def Paste():
+            event.widget.insert("sel.first",event.widget.clipboard_get())
+        
+        def Delete():
+            event.widget.delete("sel.first","sel.last")
+            
 
         menu = Menu(self.root,tearoff=0)
         menu.add_command(label="Copy",command=lambda:Copy())
         menu.add_command(label="Cut",command=lambda:Cut())
-        menu.add_command(label="Warning: Might not work")
+        menu.add_command(label="Paste",command=lambda:Paste())
+        menu.add_command(label="Delete",command=lambda:Delete())
+        menu.add_separator()
+        menu.add_command(label="Warning: Might not work.",background="#dd2222")
         menu.post(event.x_root,event.y_root)
 
     def NewTab(self):
@@ -182,23 +192,37 @@ class Editor:
         self.RandomTabStrings.append(RandomString)
         self.Pages[RandomString]  = (ttk.Frame(self.MainEditor),self.FileName.get())
         E = self.Pages[RandomString][0]        
+
+
         self.MainEditor.add(E, text=f"{self.FileName.get().split('/')[-1]}",image=self.root.FileIcon,compound="left")
+
+
+
         SVBar = Scrollbar(E)
         SVBar.pack (side = RIGHT, fill = "y")
         SHBar = Scrollbar(E, orient = HORIZONTAL)
         SHBar.pack (side = BOTTOM, fill = "x")
+
         deprint(self.FileName.get(),True)
+
         Display = IDEText(E,filename=self.FileName.get(),height = 500, width = 500,yscrollcommand = SVBar.set,xscrollcommand = SHBar.set, wrap = "none")
         Display.pack(expand = 0, fill = BOTH)
         Display.bind("<Button-3>",lambda event:self.PopupMenu(event))
+
+
         SHBar.config(command = Display.xview)
         SVBar.config(command = Display.yview)
+
         Display.insert(END,  f"""{self.FileContent.get()}""")
         
+
+
         #@ Higlighting Code
         source.ImportantFunctions.highlight(Display)
         self.root.bind("<KeyRelease>",lambda event: source.ImportantFunctions.highlight(Display))
-    
+
+
+
     def ImageTab(self):
         self.MainEditorCount += 1
         RandomString = self.RandomString()

@@ -1,5 +1,4 @@
-# TkIDE  Version 1.8
-
+# TkIDE  Version 1.8.1
 ### Merry Christmas! :christmas_tree: :santa:
 
 ### that goal is coming fast...
@@ -19,10 +18,15 @@
 
 ## Changes  
 
+
+- ## 1.8.2
+- Finished right click menu, added paste, cut, delete.
+
 - ## 1.8
-- Finally actually added the syntax highlighting, tested with Python. Problem is it doesn't work properly, as I haven't added all the color rules.
+- Finally actually added the syntax highlighting, tested with Python. Problem is it doesn't work fully, as I haven't added all the color rules.
 - Added Image Icon, and actually fixed the deprecation issues, which i left untouched last version.
 - Optimized the syntax highlighting.
+
 
 - ## 1.7.2
 - Worked more on syntax highlighting with [Pygments](https://pygments.org/).
