@@ -5,7 +5,7 @@
 
 import string,random,os,source.ImportantFunctions,json
 import tkinter
-from tkinter import Event, ttk,filedialog,Text,Tk,StringVar,Menu,Toplevel,Button,BOTTOM,END,HORIZONTAL,Entry,CURRENT
+from tkinter import Event, ttk,filedialog,Text,Tk,StringVar,Menu,Toplevel,Button,BOTTOM,END,HORIZONTAL,Entry,CURRENT,NW,RIGHT
 from source.CustomClasses import *
 #Make sure pil is always after any modules with a class called Image or ImageTk
 from PIL import Image, ImageTk
