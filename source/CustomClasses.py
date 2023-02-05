@@ -1,7 +1,7 @@
-#Most of the code here is from stackoverflow but modified to fit my needs.
+#Most of the code here adapted from stackoverflow  to fit my needs.
 
 
-from tkinter import Text,Tk,Label,Scrollbar,IntVar,Frame,LEFT,RIGHT,Y,NW,NE,BOTH,font,ttk,PhotoImage,Canvas,END #end is used in highlighting
+from tkinter import Text,Tk,Label,Scrollbar,IntVar,Frame,NE,BOTH,font,ttk,PhotoImage,Canvas,END,Toplevel #end is used in highlighting
 import os
 
 #Adapted from https://stackoverflow.com/questions/3781670/how-to-highlight-text-in-a-tkinter-text-widget?rq=1, https://stackoverflow.com/questions/32058760/improve-pygments-syntax-highlighting-speed-for-tkinter-text
@@ -149,3 +149,12 @@ class CustomNotebook(ttk.Notebook):
             ]
         })
     ])
+
+
+class RunWindow():
+    def __init__(self):
+        self.root = Toplevel()
+        self.root.title('Run Output')
+        text = Text(self.root)
+        text.pack(expand=True,fill=BOTH)
+        text.insert(END,"NOT USED:NO FUNCTIONALITY YET")    

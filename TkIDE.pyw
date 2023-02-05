@@ -90,19 +90,7 @@ class Editor:
     
     
     def Run(self):
-        root = Toplevel()
-        root.title('Run')
-        text = Text(root)
-        text.pack(expand=True,fill=BOTH)
-        text.insert(END,"NOT USED:NO FUNCTIONALITY YET")    
-
-
-    def ExtCommand(self):
-        root = Toplevel()
-        root.title('Run Command')
-        command = StringVar()
-        Entry(root,textvariable=command).pack(expand=True,fill=BOTH)
-        Button(root,text='Run Provided Command',command=lambda:self.iel(root,command.get().split("/"))).pack(side=BOTTOM)
+        RunWindow()
 
 
     #SECTION:SAVE   

@@ -10,7 +10,9 @@ root = tkinter.Tk()
 #create the textbox
 textPad = ScrolledText.ScrolledText(root, width=100, height=80)
 textPad.tag_configure("Token.Comment.Single", foreground="#aaaaaa")
-textPad.tag_configure("Token.Literal.Number.Inteer", foreground="#aaaaaa")
+textPad.tag_configure("Token.Literal.Number.Integer", foreground="#aaaaaa")
+textPad.tag_configure("Token.Comment.Single", foreground="#aaaaaa")
+textPad.tag_configure("Token.Literal.Number.Integer", foreground="#aaaaaa")
 code = textPad.get("1.0", "end-1c")
 mylexer69420 = PythonLexer()
 
@@ -26,4 +28,4 @@ def syn(event=None):
 
 textPad.pack()
 root.bind("<KeyRelease>", syn)
-root.mainloop()
+root.mainloop() 
