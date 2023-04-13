@@ -201,6 +201,7 @@ class TerminalWindow:
         self.entry = Entry(self.root)
         self.entry.pack(side='bottom', fill='x')
         self.entry.bind('<Return>', self.on_return)
+        self.entry.focus()
         
         self.text.insert(END, ">>> ")
         
@@ -223,7 +224,7 @@ class TerminalWindow:
             except IndexError:
                 self.text.insert(END,f"Error, add a filename. Ex:newtab C:/Users/user/test.txt\n")
         else:
-            self.text.insert(END, f"Error: command {command} not known \n")
+            self.text.insert(END, f"Error: command \"{command}\" not known \n")
         
     def run(self):
         self.root.mainloop()
