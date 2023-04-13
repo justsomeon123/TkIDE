@@ -1,12 +1,11 @@
-#INFO Version:2.0 Last Updated:2022-07-5
+#INFO Version:2.1 Last Updated:2023-02-23
 #Look at README.md for more information
 #############################################################################################
 #TkIDE.pyw
 
 import string,random,os,source.ImportantFunctions,json
-import tkinter
-from tkinter import Event, ttk,filedialog,Text,Tk,StringVar,Menu,Toplevel,Button,BOTTOM,END,HORIZONTAL,Entry,CURRENT,NW,RIGHT
-from source.CustomClasses import *
+from tkinter import Event, ttk,filedialog,Tk,StringVar,Menu,Toplevel,Button,BOTTOM,END,HORIZONTAL,CURRENT,NW,RIGHT,BOTH,Scrollbar,Label
+import source.CustomClasses as cc
 #Make sure pil is always after any modules with a class called Image or ImageTk
 from PIL import Image, ImageTk
 
@@ -23,9 +22,6 @@ class Editor:
             self.settings = json.load(f)
 
                 
-        self.FileName = StringVar()
-        self.FileName.set('')
-        self.FileContent = StringVar()
 
         #SECTION:Icons
         self.root.MainIcon = ImageTk.PhotoImage(Image.open(self.settings["icon"]),Image.Resampling.NEAREST)
@@ -37,7 +33,7 @@ class Editor:
         self.root.bind('<Control-s>',lambda event:self.Save())
         self.root.bind('<Control-n>',lambda event:self.CreateFile())
         self.root.bind('<Control-d>',lambda event:self.DeleteFileConfirm())
-        self.root.bind('<Control-r>',lambda event:self.Run())
+        self.root.bind('<Control-`>',lambda event:self.Terminal())
 
 
         
@@ -58,75 +54,83 @@ class Editor:
         self.FileMenu.add_separator(background="red")
         self.FileMenu.add_command(label="Delete a File",foreground="red",command=lambda:self.DeleteFileConfirm(),background="dark red")
         ##SUBSECTION:File Menu:END
-        ##SUBSECTION:Run Menu
-        self.RunMenu = Menu(self.Menu,tearoff=0)
-        self.RunMenu.add_command(label='Run (PYTHON ONLY)',command=lambda:self.Run())
-        ##SUBSECTION:Run Menu:END
+
+        ##SUBSECTION:Terminal Menu
+        self.TerminalMenu = Menu(self.Menu,tearoff=0)
+        self.TerminalMenu.add_command(label='Terminal',command=lambda:self.Terminal())
+        ##SUBSECTION:Terminal Menu:END
+
         ##SUBSECTION:Menu adding
         self.Menu.add_cascade(label="File",menu=self.FileMenu)
-        self.Menu.add_cascade(label="Run",menu=self.RunMenu)
+        self.Menu.add_cascade(label="Terminal",menu=self.TerminalMenu)
         self.root.config(menu=self.Menu)
         ##SUBSECTION:Menu adding:END
         
         #SECTION:Main Editor
-        self.MainEditorCount = 0
-        self.Pages = {}
-        self.RandomTabStrings = []
-        RandomString = self.RandomString()
-        self.RandomTabStrings.append(RandomString)
-        self.MainEditor = CustomNotebook(self.RandomTabStrings,self.Pages)
+        self.MainEditorCount = 0 #Tab count.
+        self.Pages = {} #dictionary of pages/tabs and their key values
+        self.RandomTabStrings = [] #Random strings that correspond to each page , look at self.RandomString() for more info.
+        self.MainEditor = cc.CustomNotebook(self.RandomTabStrings,self.Pages) #the main editor interface. (View CustomClasses.CustomNotebook for more information)
         self.MainEditor.pack(expand=True,fill=BOTH)
-        self.Pages[RandomString]  = (ttk.Frame(self.MainEditor),self.FileName.get())
-        E = self.Pages[RandomString][0]
-        self.MainEditor.add(E, text=f"Home",image=self.root.MainIcon,compound="left")
-        ttk.Label(E,text="Press these buttons or use the menu at the top").pack(anchor=NW,pady=10)
+
+
+
+
+        ##SECTION:Welcome Page
+        tab_identifier = self.RandomString() #Creates a tab identifier for this tab.
+        self.RandomTabStrings.append(tab_identifier) #Adds it to the storage of tab identifiers.
+        self.Pages[tab_identifier]  = (ttk.Frame(self.MainEditor),"welcomepage") #Stores the informaton on each pages critical parts
+        E = self.Pages[tab_identifier][0] #E is the Frame holding the editor/page content
+        self.MainEditor.add(E, text=f"Home",image=self.root.MainIcon,compound="left") # Add a tab.
+        ttk.Label(E,text="Press these buttons or use the menu at the top").pack(anchor=NW,pady=10) #Buttons on welcome page.
         ttk.Button(E,text="Open File",command=lambda:self.OpenFile()).pack(anchor=NW)
         ttk.Button(E,text="Create a New File",command=lambda:self.CreateFile()).pack(anchor=NW)
         ttk.Button(E,text="Delete a File",command=lambda:self.DeleteFileConfirm()).pack(anchor=NW)
         
         
         #SECTION:Loop
-        self.root.mainloop()
+        self.root.mainloop() #Gui loop.
     
     
-    def Run(self):
-        RunWindow()
+    def Terminal(self):
+        cc.TerminalWindow(self)
 
 
     #SECTION:SAVE   
     def Save(self):
+        "Quick code to save current editor (text) state to the file."
         index = self.MainEditor.index(CURRENT)
-        RandomString = self.RandomTabStrings[index]
-        Frame = self.Pages[RandomString][0]
+        tab_identifier = self.RandomTabStrings[index]
+        Frame = self.Pages[tab_identifier][0]
         children = Frame.winfo_children()
 
         for child in children:
-            if type(child) == IDEText:
+            if type(child) == cc.IDEText:
                 self.Display = child
 
-        with open(self.Pages[RandomString][1],'r+') as f:
+        with open(self.Pages[tab_identifier][1],'r+') as f:
             resave = self.Display.get('1.0','end-1c')
             f.truncate()
             f.write(resave)
 
     def OpenFile(self):
+        "Dialog for opening a file"
         filename = filedialog.askopenfilename(initialdir = '/',title = "Choose a file to edit",)
         if filename.endswith(("png","gif","jpg","jpeg","ico")):
-            self.FileName.set(filename)
-            self.ImageTab()
+            self.ImageTab(filename)
             return
         deprint(filename)
-        self.FileName.set(filename)
-        self.NewTab()
+        self.NewTab(filename)
 
     def CreateFile(self):
+        "Dialog for creating a new file"
         f = filedialog.asksaveasfile(mode='w')
         if f is None:
             return
-        self.FileName.set(f.name)
-        self.NewTab()
+        self.NewTab(f.name)
 
     def DeleteFileConfirm(self):
+        """The confirmation dialog for deleting a file"""
         self.deleteroot = Toplevel()
         self.deleteroot.title('Are you sure?!')
         Label(self.deleteroot,text="Are you sure that you want to delete a file?").pack()
@@ -140,7 +144,8 @@ class Editor:
         self.deleteroot.destroy()
     
     def RandomString(self):
-        return ''.join(random.choices(string.ascii_letters,k=10)) #1/141167095653376 chance to be g 
+        """Generates a random string, kind of like uuid, but not universally unique. Don't even ask why this exists."""
+        return ''.join(random.choices(string.ascii_letters,k=10)) #1/141167095653376 chance to be the same (at least i think so.)
     
     def PopupMenu(self,event:Event):
         def Copy():
@@ -170,19 +175,19 @@ class Editor:
         menu.add_command(label="Warning: Might not work.",background="#dd2222")
         menu.post(event.x_root,event.y_root)
 
-    def NewTab(self):
-        with open(self.FileName.get(),encoding="UTF-8") as f:
-            self.FileContent.set(f.read())
+    def NewTab(self,filename):
+        with open(filename,encoding="UTF-8") as f:
+            filecontent= f.read()
         
         #@ I don't even know. This code is unreadable. Please send help.
         self.MainEditorCount += 1
-        RandomString = self.RandomString()
-        self.RandomTabStrings.append(RandomString)
-        self.Pages[RandomString]  = (ttk.Frame(self.MainEditor),self.FileName.get())
-        E = self.Pages[RandomString][0]        
+        tab_identifier = self.RandomString()
+        self.RandomTabStrings.append(tab_identifier)
+        self.Pages[tab_identifier]  = (ttk.Frame(self.MainEditor),filename)
+        E = self.Pages[tab_identifier][0]        
 
 
-        self.MainEditor.add(E, text=f"{self.FileName.get().split('/')[-1]}",image=self.root.FileIcon,compound="left")
+        self.MainEditor.add(E, text=f"{filename.split('/')[-1]}",image=self.root.FileIcon,compound="left")
 
 
 
@@ -191,9 +196,9 @@ class Editor:
         SHBar = Scrollbar(E, orient = HORIZONTAL)
         SHBar.pack (side = BOTTOM, fill = "x")
 
-        deprint(self.FileName.get(),True)
+        deprint(filename,True)
 
-        Display = IDEText(E,filename=self.FileName.get(),height = 500, width = 500,yscrollcommand = SVBar.set,xscrollcommand = SHBar.set, wrap = "none")
+        Display = cc.IDEText(E,filename=filename,height = 500, width = 500,yscrollcommand = SVBar.set,xscrollcommand = SHBar.set, wrap = "none")
         Display.pack(expand = 0, fill = BOTH)
         Display.bind("<Button-3>",lambda event:self.PopupMenu(event))
 
@@ -201,7 +206,7 @@ class Editor:
         SHBar.config(command = Display.xview)
         SVBar.config(command = Display.yview)
 
-        Display.insert(END,  f"""{self.FileContent.get()}""")
+        Display.insert(END,  f"""{filecontent}""")
         
 
 
@@ -211,20 +216,20 @@ class Editor:
 
 
 
-    def ImageTab(self):
+    def ImageTab(self,filename):
         self.MainEditorCount += 1
-        RandomString = self.RandomString()
-        self.RandomTabStrings.append(RandomString)
-        self.Pages[RandomString]  = (ttk.Frame(self.MainEditor),self.FileName.get())
-        E = self.Pages[RandomString][0]
-        self.MainEditor.add(E, text=f"{self.FileName.get().split('/')[-1]}",image=self.root.ImageIcon,compound="left") 
+        tab_identifier = self.RandomString()
+        self.RandomTabStrings.append(tab_identifier)
+        self.Pages[tab_identifier]  = (ttk.Frame(self.MainEditor),filename)
+        E = self.Pages[tab_identifier][0]
+        self.MainEditor.add(E, text=f"{filename.split('/')[-1]}",image=self.root.ImageIcon,compound="left") 
         #@ ^  creating a tab for the image holder.
 
         #WARN size can't be zero
         
         #@ v resize the image until it fits inside without being too big.
         size=self.settings['ImageScaleSize']
-        image = Image.open(self.FileName.get())
+        image = Image.open(filename)
         if image.size[0] * size < E.winfo_screenwidth(): 
             if image.size[1] * size < E.winfo_screenheight():        
                 [imageSizeWidth, imageSizeHeight] = image.size
@@ -234,7 +239,7 @@ class Editor:
 
 
 
-        #! v NOT WORKING CODE FOR GIFS
+        #! v BROKEN CODE FOR GIFS
         ''' 
         for frame in range(0,image.n_frames):
             image.seek(frame)
@@ -253,7 +258,7 @@ class Editor:
     
         #@ Handles packing and showing the image in the screen.
         img = ImageTk.PhotoImage(image)
-        label = Label(E, image=img,text="Image not supported/not Loaded")
+        label = Label(E, image=img,text="Image not supported/cannot be loaded")
         label.image = img #WARN required for image to appear
         label.pack()
 

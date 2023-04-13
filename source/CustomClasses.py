@@ -1,7 +1,8 @@
-#Most of the code here adapted from stackoverflow  to fit my needs.
+"""Some code for classes like IDEText"""
+#Most of the code here is adapted from stackoverflow to fit my needs.
 
-
-from tkinter import Text,Tk,Label,Scrollbar,IntVar,Frame,NE,BOTH,font,ttk,PhotoImage,Canvas,END,Toplevel #end is used in highlighting
+import sys
+from tkinter import Text,Label,Frame,NE,BOTH,font,ttk,PhotoImage,END,Toplevel,Scrollbar,Entry 
 import os
 
 #Adapted from https://stackoverflow.com/questions/3781670/how-to-highlight-text-in-a-tkinter-text-widget?rq=1, https://stackoverflow.com/questions/32058760/improve-pygments-syntax-highlighting-speed-for-tkinter-text
@@ -151,10 +152,78 @@ class CustomNotebook(ttk.Notebook):
     ])
 
 
-class RunWindow():
-    def __init__(self):
+class FileSystemWidget(ttk.Frame):
+    def __init__(self, master, path):
+        super().__init__(master)
+
+        self.treeview = ttk.Treeview(self, columns=("type",))
+        self.treeview.heading("#0", text=path, anchor="w")
+        self.treeview.column("#0", width=300)
+        self.treeview.column("type", width=50)
+        self.treeview.pack(side="left", fill="both", expand=True)
+
+        self.scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.treeview.yview)
+        self.treeview.configure(yscrollcommand=self.scrollbar.set)
+        self.scrollbar.pack(side="right", fill="y")
+
+        self.populate_treeview(path)
+
+    def populate_treeview(self, path, parent=""):
+        for filename in os.listdir(path):
+            full_path = os.path.join(path, filename)
+            truncated_filename = filename[:25] + "..." if len(filename) > 25 else filename
+            item = self.treeview.insert(parent, "end", text=truncated_filename, values=(self.get_filetype(full_path),))
+            if os.path.isdir(full_path):
+                self.populate_treeview(full_path, parent=item)
+
+    def get_filetype(self, path):
+        if os.path.isdir(path):
+            return "dir"
+        else:
+            return "file"
+
+
+class TerminalWindow:
+    def __init__(self,zehigherone):
         self.root = Toplevel()
+        self.parent = zehigherone
         self.root.title('Run Output')
-        text = Text(self.root)
-        text.pack(expand=True,fill=BOTH)
-        text.insert(END,"NOT USED:NO FUNCTIONALITY YET")    
+        self.text = Text(self.root)
+        self.text.pack(expand=True, fill=BOTH)
+        
+        # create a scroll bar and attach it to the text widget
+        scroll = Scrollbar(self.root)
+        scroll.pack(side='right', fill='y')
+        scroll.config(command=self.text.yview)
+        self.text.config(yscrollcommand=scroll.set)
+        
+        # create an entry widget to take user input
+        self.entry = Entry(self.root)
+        self.entry.pack(side='bottom', fill='x')
+        self.entry.bind('<Return>', self.on_return)
+        
+        self.text.insert(END, ">>> ")
+        
+    def on_return(self, event):
+        # get the user input and process it
+        user_input = self.entry.get()
+        self.text.insert(END, user_input + '\n')
+        self.entry.delete(0, END)
+        self.process_command(user_input)
+        self.text.insert(END, ">>> ")
+        
+    def process_command(self, command:str):
+        if command == "forcequit":
+            sys.exit(0)
+        if command.startswith("newtab"):
+            try:
+                z = command.removeprefix("newtab").strip()
+                self.parent.NewTab(z)
+                self.text.insert(END,f"Created tab for file {z}\n")
+            except IndexError:
+                self.text.insert(END,f"Error, add a filename. Ex:newtab C:/Users/user/test.txt\n")
+        else:
+            self.text.insert(END, f"Error: command {command} not known \n")
+        
+    def run(self):
+        self.root.mainloop()

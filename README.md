@@ -1,27 +1,30 @@
-# TkIDE  Version 2.0
-### look i ran out of tme ok deal with shit edition, i know im late.
+# TkIDE  Version 2.1
+### huh... i ran out of things to say.
 
 
 <br>
 
 # Disclaimers
 - ## **WARNING**: TkIDE is a work in progress project. I am not responsible for any damage done to your computer.
-- ## This version was not checked in exe form, and not built in exe form.
 - ## **Beware!**
   - ### **TkIDE** could be closed at any time.
 
 - ## TkIDE is not an actual IDE. It is a code editor with limited functionality.
 
-
-- ### TkIDE's raw code only works with Python 3.9 and above.
+- ### TkIDE's raw code only works with Python 3.9 and above (as to my knowledge)
 
 
 ## Changes  
 
 
+- ## 2.1
+  - Added file explorer! (hopefully works?)
+  - more readme errors
+
 - ## 2.0
   - Fixed readme errors.
   - New Icon.
+
 - ## 1.8.2
   - Finished right click menu, added paste, cut, delete.
 
@@ -33,7 +36,7 @@
 
 - ## 1.7.2
   - Worked more on syntax highlighting with [Pygments](https://pygments.org/).
-- Fixed deprecation issues with Pillow NEAREST, and imgdhr.
+  - Fixed deprecation issues with Pillow NEAREST, and imgdhr.
   - Removed extensions. They were too much of a hassle, and were too hard for me to get to work. So, as of now, there will be no extensions. In the future there may be extension support, but for now, it will not exist.
   - Removed tree file view. It was hard too work on, and there were too many problems with it.
 

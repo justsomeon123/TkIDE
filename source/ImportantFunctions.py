@@ -1,5 +1,6 @@
+"""Some important functions, mostly just the highlighting function"""
 import platform
-from source.CustomClasses import IDEText,END
+from source.CustomClasses import IDEText
 from pygments import lex
 import pygments.lexers as lexers
 

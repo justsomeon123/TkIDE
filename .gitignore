@@ -8,6 +8,9 @@
 #venv
 /venv
 /.vscode
+#personal files
+sec*
+
 #hide distbrution
 
 /dist/TkIDE
