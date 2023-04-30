@@ -1,9 +1,12 @@
 """Some code for classes like IDEText"""
 #Most of the code here is adapted from stackoverflow to fit my needs.
 
-import sys
-from tkinter import Text,Label,Frame,NE,BOTH,font,ttk,PhotoImage,END,Toplevel,Scrollbar,Entry 
 import os
+import subprocess
+import sys
+from tkinter import (BOTH, END, NE, Entry, Frame, Label, PhotoImage, Scrollbar,
+                     Text, Toplevel, font, ttk)
+
 
 #Adapted from https://stackoverflow.com/questions/3781670/how-to-highlight-text-in-a-tkinter-text-widget?rq=1, https://stackoverflow.com/questions/32058760/improve-pygments-syntax-highlighting-speed-for-tkinter-text
 class IDEText(Text):
@@ -152,6 +155,8 @@ class CustomNotebook(ttk.Notebook):
     ])
 
 
+##! UNUSED
+
 class FileSystemWidget(ttk.Frame):
     def __init__(self, master, path):
         super().__init__(master)
@@ -182,6 +187,7 @@ class FileSystemWidget(ttk.Frame):
         else:
             return "file"
 
+##! BUGGY TERM
 
 class TerminalWindow:
     def __init__(self,zehigherone):
@@ -190,6 +196,8 @@ class TerminalWindow:
         self.root.title('Run Output')
         self.text = Text(self.root)
         self.text.pack(expand=True, fill=BOTH)
+        self.text.bind("<Button-1>", lambda e: "break")
+        self.text.bind("<Key>", lambda e: "break")
         
         # create a scroll bar and attach it to the text widget
         scroll = Scrollbar(self.root)
@@ -214,17 +222,48 @@ class TerminalWindow:
         self.text.insert(END, ">>> ")
         
     def process_command(self, command:str):
+        
         if command == "forcequit":
             sys.exit(0)
+        
         if command.startswith("newtab"):
             try:
                 z = command.removeprefix("newtab").strip()
                 self.parent.NewTab(z)
                 self.text.insert(END,f"Created tab for file {z}\n")
-            except IndexError:
+            except Exception:
                 self.text.insert(END,f"Error, add a filename. Ex:newtab C:/Users/user/test.txt\n")
+            return 0
+        
+        if command == "term":
+            TrueTerminalWindow() 
+        
         else:
             self.text.insert(END, f"Error: command \"{command}\" not known \n")
+
+
+
+
+class TrueTerminalWindow():
+    def __init__(self):
+        self.main = Toplevel()
+        self.main.title("Terminal Window (PLEASE NOTE, WON'T WORK WITH EVERYTHING!)")
+        self.ttext = Text(self.main)
+        self.ttext.bind("<Button-1>", lambda e: "break")
+        self.ttext.bind("<Key>", lambda e: "break")
+        self.ttext.pack()
+
         
-    def run(self):
-        self.root.mainloop()
+
+        self.cmdent = Entry(self.main)
+        self.cmdent.pack(anchor="s")
+        self.cmdent.bind("<Return>",self.run_cmd)
+    
+    def run_cmd(self,e):
+        cmd = self.cmdent.get()
+        self.cmdent.delete("0","end")
+        res = subprocess.run(cmd.split(" "),capture_output=True,text=True,shell=True)
+        if res.stdout:
+            self.ttext.insert("end","\n"+res.stdout)
+        elif res.stderr:
+            self.ttext.insert("end","\n"+res.stderr)
