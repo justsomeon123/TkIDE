@@ -190,9 +190,9 @@ class FileSystemWidget(ttk.Frame):
 ##! BUGGY TERM
 
 class TerminalWindow:
-    def __init__(self,zehigherone):
+    def __init__(self,parent):
         self.root = Toplevel()
-        self.parent = zehigherone
+        self.parent = parent
         self.root.title('Run Output')
         self.text = Text(self.root)
         self.text.pack(expand=True, fill=BOTH)
