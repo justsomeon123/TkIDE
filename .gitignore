@@ -5,14 +5,16 @@
 #pyc files
 *.pyc
 **/__pycache__
+
 #venv
-/venv
+/TKVenv
+
+#vscode config
 /.vscode
 #personal files
 sec*
 
 #hide distbrution
-
 /dist/TkIDE
 *.iss
 desktop.ini

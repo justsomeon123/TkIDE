@@ -2,5 +2,7 @@
     "icon":"./assets/icon.png",
     "file-icon":"./assets/file.png",
     "image-icon":"./assets/image.png",
-    "ImageScaleSize":8
+    "imageResizeCoeffiecent":8,
+    "enableHighlighting":false,
+    "debug":false
 }

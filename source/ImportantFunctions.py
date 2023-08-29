@@ -20,7 +20,10 @@ def highlight(Display:IDEText):
 
             Display.tag_add(str(token), start, end)
         except Exception:
+            #very buggy code, so rather than crashing when unable to parse and hhighlight
+            #simply ignore, and don't highlight any text
             pass
+
 
 
 def FullScreen(root) -> None: 

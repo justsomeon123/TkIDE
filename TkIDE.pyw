@@ -1,18 +1,28 @@
-#INFO Version:2.1 Last Updated:2023-02-23
+#INFO Version:2.1.2 Last Updated:2023-08-21
 #Look at README.md for more information
 #############################################################################################
 #TkIDE.pyw
 
-import string,random,os,source.ImportantFunctions,json
-from tkinter import Event, ttk,filedialog,Tk,StringVar,Menu,Toplevel,Button,BOTTOM,END,HORIZONTAL,CURRENT,NW,RIGHT,BOTH,Scrollbar,Label
-import source.CustomClasses as cc
-#Make sure pil is always after any modules with a class called Image or ImageTk
+
+import json
+import os
+import random
+import string
+from tkinter import (BOTH, BOTTOM, CURRENT, END, HORIZONTAL, NW, RIGHT, Button,
+                     Event, Label, Menu, Scrollbar, Tk, Toplevel, filedialog,
+                     messagebox, ttk)
+
+#Make sure pil is always imported after any modules with a class called Image or ImageTk
 from PIL import Image, ImageTk
+
+import source.CustomClasses as cc
+import source.ImportantFunctions
+
 
 def deprint(text,debug=False):
     if debug:
         print(text)
-        
+
 class Editor:
     def __init__(self) -> None:
         #SECTION:Setup
@@ -80,16 +90,21 @@ class Editor:
         tab_identifier = self.RandomString() #Creates a tab identifier for this tab.
         self.RandomTabStrings.append(tab_identifier) #Adds it to the storage of tab identifiers.
         self.Pages[tab_identifier]  = (ttk.Frame(self.MainEditor),"welcomepage") #Stores the informaton on each pages critical parts
-        E = self.Pages[tab_identifier][0] #E is the Frame holding the editor/page content
-        self.MainEditor.add(E, text=f"Home",image=self.root.MainIcon,compound="left") # Add a tab.
-        ttk.Label(E,text="Press these buttons or use the menu at the top").pack(anchor=NW,pady=10) #Buttons on welcome page.
-        ttk.Button(E,text="Open File",command=lambda:self.OpenFile()).pack(anchor=NW)
-        ttk.Button(E,text="Create a New File",command=lambda:self.CreateFile()).pack(anchor=NW)
-        ttk.Button(E,text="Delete a File",command=lambda:self.DeleteFileConfirm()).pack(anchor=NW)
+        PageFrame = self.Pages[tab_identifier][0] #PageFrame is the Frame holding the editor/page content
+        self.MainEditor.add(PageFrame, text=f"Home",image=self.root.MainIcon,compound="left") # Add a tab.
+        ttk.Label(PageFrame,text="Press these buttons or use the menu at the top").pack(anchor=NW,pady=10) #Buttons on welcome page.
+        ttk.Button(PageFrame,text="Open File",command=lambda:self.OpenFile()).pack(anchor=NW)
+        ttk.Button(PageFrame,text="Create a New File",command=lambda:self.CreateFile()).pack(anchor=NW)
+        ttk.Button(PageFrame,text="Delete a File",command=lambda:self.DeleteFileConfirm()).pack(anchor=NW)
         
-        
+        if not self.settings["enableHighlighting"]:
+            messagebox.showinfo("Highlighting","Highlighting is disabled. Go to settings to enable it.")
+
         #SECTION:Loop
         self.root.mainloop() #Gui loop.
+
+        
+            
     
     
     def Terminal(self):
@@ -148,31 +163,38 @@ class Editor:
         return ''.join(random.choices(string.ascii_letters,k=10)) #1/141167095653376 chance to be the same (at least i think so.)
     
     def PopupMenu(self,event:Event):
-        def Copy():
+        def copy():
             event.widget.clipboard_clear()
             deprint(event.widget.selection_get())
             event.widget.clipboard_append(event.widget.selection_get())
         
-        def Cut():
+        def cut():
             event.widget.clipboard_clear()
             deprint(event.widget.selection_get())
             event.widget.delete("sel.first","sel.last")
             event.widget.clipboard_append(event.widget.selection_get())
         
-        def Paste():
+        def paste():
             event.widget.insert("sel.first",event.widget.clipboard_get())
         
-        def Delete():
+        def delete():
             event.widget.delete("sel.first","sel.last")
+        
+        def google():
+            from urllib.parse import quote
+            from webbrowser import open as browseropen
+            browseropen(f"https://www.google.com/?q={quote(event.widget.selection_get())}")
+            #always be secure kids!
+   
             
 
         menu = Menu(self.root,tearoff=0)
-        menu.add_command(label="Copy",command=lambda:Copy())
-        menu.add_command(label="Cut",command=lambda:Cut())
-        menu.add_command(label="Paste",command=lambda:Paste())
-        menu.add_command(label="Delete",command=lambda:Delete())
+        menu.add_command(label="Copy",command=lambda:copy())
+        menu.add_command(label="Cut",command=lambda:cut())
+        menu.add_command(label="Paste",command=lambda:paste())
+        menu.add_command(label="Delete",command=lambda:delete())
+        menu.add_command(label="Search selection",command=lambda:google())
         menu.add_separator()
-        menu.add_command(label="Warning: Might not work.",background="#dd2222")
         menu.post(event.x_root,event.y_root)
 
     def NewTab(self,filename):
@@ -184,21 +206,21 @@ class Editor:
         tab_identifier = self.RandomString()
         self.RandomTabStrings.append(tab_identifier)
         self.Pages[tab_identifier]  = (ttk.Frame(self.MainEditor),filename)
-        E = self.Pages[tab_identifier][0]        
+        PageFrame = self.Pages[tab_identifier][0]        
 
 
-        self.MainEditor.add(E, text=f"{filename.split('/')[-1]}",image=self.root.FileIcon,compound="left")
+        self.MainEditor.add(PageFrame, text=f"{filename.split('/')[-1]}",image=self.root.FileIcon,compound="left")
 
 
 
-        SVBar = Scrollbar(E)
-        SVBar.pack (side = RIGHT, fill = "y")
-        SHBar = Scrollbar(E, orient = HORIZONTAL)
-        SHBar.pack (side = BOTTOM, fill = "x")
+        SVBar = Scrollbar(PageFrame)
+        SVBar.pack(side = RIGHT, fill = "y")
+        SHBar = Scrollbar(PageFrame, orient = HORIZONTAL)
+        SHBar.pack(side = BOTTOM, fill = "x")
 
         deprint(filename,True)
 
-        Display = cc.IDEText(E,filename=filename,height = 500, width = 500,yscrollcommand = SVBar.set,xscrollcommand = SHBar.set, wrap = "none")
+        Display = cc.IDEText(PageFrame,filename=filename,height = 500, width = 500,yscrollcommand = SVBar.set,xscrollcommand = SHBar.set, wrap = "none")
         Display.pack(expand = 0, fill = BOTH)
         Display.bind("<Button-3>",lambda event:self.PopupMenu(event))
 
@@ -211,8 +233,11 @@ class Editor:
 
 
         #@ Higlighting Code
-        source.ImportantFunctions.highlight(Display)
-        self.root.bind("<KeyRelease>",lambda event: source.ImportantFunctions.highlight(Display))
+        if self.settings["enableHighlighting"]:
+            source.ImportantFunctions.highlight(Display)
+            self.root.bind("<KeyRelease>",lambda event: source.ImportantFunctions.highlight(Display))
+
+            
 
 
 
@@ -221,8 +246,8 @@ class Editor:
         tab_identifier = self.RandomString()
         self.RandomTabStrings.append(tab_identifier)
         self.Pages[tab_identifier]  = (ttk.Frame(self.MainEditor),filename)
-        E = self.Pages[tab_identifier][0]
-        self.MainEditor.add(E, text=f"{filename.split('/')[-1]}",image=self.root.ImageIcon,compound="left") 
+        PageFrame = self.Pages[tab_identifier][0]
+        self.MainEditor.add(PageFrame, text=f"{filename.split('/')[-1]}",image=self.root.ImageIcon,compound="left") 
         #@ ^  creating a tab for the image holder.
 
         #WARN size can't be zero
@@ -230,8 +255,8 @@ class Editor:
         #@ v resize the image until it fits inside without being too big.
         size=self.settings['ImageScaleSize']
         image = Image.open(filename)
-        if image.size[0] * size < E.winfo_screenwidth(): 
-            if image.size[1] * size < E.winfo_screenheight():        
+        if image.size[0] * size < PageFrame.winfo_screenwidth(): 
+            if image.size[1] * size < PageFrame.winfo_screenheight():        
                 [imageSizeWidth, imageSizeHeight] = image.size
                 newImageSizeWidth = int(imageSizeWidth*size)
                 newImageSizeHeight = int(imageSizeHeight*size) 
@@ -246,10 +271,10 @@ class Editor:
             n=self.settings['ImageSize']
             image = image
             deprint(image.size) 
-            deprint(f'({E.winfo_screenwidth()},{E.winfo_screenheight()})')
-            if image.size[0] * n < E.winfo_screenwidth(): 
+            deprint(f'({PageFrame.winfo_screenwidth()},{PageFrame.winfo_screenheight()})')
+            if image.size[0] * n < PageFrame.winfo_screenwidth(): 
                 deprint('got past step one')
-                if image.size[1] * n < E.winfo_screenheight():        
+                if image.size[1] * n < PageFrame.winfo_screenheight():        
                     [imageSizeWidth, imageSizeHeight] = image.size
                     newImageSizeWidth = int(imageSizeWidth*n)
                     newImageSizeHeight = int(imageSizeHeight*n) 
@@ -258,7 +283,7 @@ class Editor:
     
         #@ Handles packing and showing the image in the screen.
         img = ImageTk.PhotoImage(image)
-        label = Label(E, image=img,text="Image not supported/cannot be loaded")
+        label = Label(PageFrame, image=img,text="Image not supported/cannot be loaded")
         label.image = img #WARN required for image to appear
         label.pack()
 
