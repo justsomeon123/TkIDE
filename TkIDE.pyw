@@ -30,11 +30,11 @@ class Editor:
     def __init__(self) -> None:
         #SECTION:Setup
         self.root = Tk()
-        self.server_init()
+        
 
         with open('./assets/settings.json') as f:
             self.settings = json.load(f)
-
+        self.server_init(settings=self.settings)
         #debug check
         debugFlag = True if self.settings["debug"] else False
         
@@ -110,10 +110,10 @@ class Editor:
         #SECTION:Loop
         self.root.mainloop() #Gui loop.
 
-    def server_init(self):
+    def server_init(self,settings):
         server_thread = threading.Thread(target=self.server,args=())
         server_thread.daemon = True #background thread
-        if self.settings["extensionsEnabled"]:
+        if settings["extensionsEnabled"]:
             server_thread.start()
 
     def server(self):
