@@ -4,5 +4,6 @@
     "image-icon":"./assets/image.png",
     "imageResizeCoeffiecent":8,
     "enableHighlighting":false,
-    "debug":false
+    "debug":false,
+    "extensionsEnabled":true
 }

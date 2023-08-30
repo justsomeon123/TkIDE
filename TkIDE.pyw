@@ -7,7 +7,9 @@
 import json
 import os
 import random
+import socket
 import string
+import threading  # Extension communication.
 from tkinter import (BOTH, BOTTOM, CURRENT, END, HORIZONTAL, NW, RIGHT, Button,
                      Event, Label, Menu, Scrollbar, Tk, Toplevel, filedialog,
                      messagebox, ttk)
@@ -18,8 +20,9 @@ from PIL import Image, ImageTk
 import source.CustomClasses as cc
 import source.ImportantFunctions
 
+debugFlag = False
 
-def deprint(text,debug=False):
+def deprint(text,debug=debugFlag):
     if debug:
         print(text)
 
@@ -27,10 +30,14 @@ class Editor:
     def __init__(self) -> None:
         #SECTION:Setup
         self.root = Tk()
+        self.server_init()
 
         with open('./assets/settings.json') as f:
             self.settings = json.load(f)
 
+        #debug check
+        debugFlag = True if self.settings["debug"] else False
+        
                 
 
         #SECTION:Icons
@@ -103,8 +110,45 @@ class Editor:
         #SECTION:Loop
         self.root.mainloop() #Gui loop.
 
+    def server_init(self):
+        server_thread = threading.Thread(target=self.server,args=())
+        server_thread.daemon = True #background thread
+        if self.settings["extensionsEnabled"]:
+            server_thread.start()
+
+    def server(self):
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_address = ("localhost",49155) #random aaahhhh port in dynamic range.
+        server_socket.bind(server_address)
+        server_socket.listen(10)
+        deprint("server listening")
+        while True:
+            client_socket, client_address = server_socket.accept()
+            deprint(f"client connect:{client_address}")
+
+            #istg if this doesn't work
+            client_thread = threading.Thread(target=self.client_handle,args=(client_socket,server_socket,client_address))
+            client_thread.daemon = True
+            client_thread.start()
         
-            
+    def client_handle(self,client_socket:socket.socket,server_socket:socket.socket,client_address:str):
+        #INFO Client socket is actually a subsocket created by the server to respond to the actual request.
+        data = int(client_socket.recv(1024))
+
+
+        if data == 1:
+            #This code is adapted from the save function below
+            for child in self.Pages[self.RandomTabStrings[self.MainEditor.index(CURRENT)]][0].winfo_children():
+                if True:
+                    display = 0
+                if type(child) == cc.IDEText:
+                    display = child
+                client_socket.send("NO-TEXT".encode())
+            else:
+                client_socket.send(display.get("0.0",END).encode())
+        else:
+            client_socket.send("CODE-INVALID".encode())
+        return 0
     
     
     def Terminal(self):
@@ -261,25 +305,6 @@ class Editor:
                 newImageSizeWidth = int(imageSizeWidth*size)
                 newImageSizeHeight = int(imageSizeHeight*size) 
                 image = image.resize((newImageSizeWidth, newImageSizeHeight), Image.Resampling.NEAREST)
-
-
-
-        #! v BROKEN CODE FOR GIFS
-        ''' 
-        for frame in range(0,image.n_frames):
-            image.seek(frame)
-            n=self.settings['ImageSize']
-            image = image
-            deprint(image.size) 
-            deprint(f'({PageFrame.winfo_screenwidth()},{PageFrame.winfo_screenheight()})')
-            if image.size[0] * n < PageFrame.winfo_screenwidth(): 
-                deprint('got past step one')
-                if image.size[1] * n < PageFrame.winfo_screenheight():        
-                    [imageSizeWidth, imageSizeHeight] = image.size
-                    newImageSizeWidth = int(imageSizeWidth*n)
-                    newImageSizeHeight = int(imageSizeHeight*n) 
-                    image = image.resize((newImageSizeWidth, newImageSizeHeight), Image.ANTIALIAS)
-        '''
     
         #@ Handles packing and showing the image in the screen.
         img = ImageTk.PhotoImage(image)
