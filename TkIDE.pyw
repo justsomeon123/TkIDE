@@ -1,4 +1,4 @@
-#INFO Version:2.1.2 Last Updated:2023-08-21
+#INFO Version:2.2 Last Updated:2023-08-31
 #Look at README.md for more information
 #############################################################################################
 #TkIDE.pyw
@@ -127,28 +127,45 @@ class Editor:
             deprint(f"client connect:{client_address}")
 
             #istg if this doesn't work
-            client_thread = threading.Thread(target=self.client_handle,args=(client_socket,server_socket,client_address))
+            client_thread = threading.Thread(target=self.client_handle,args=(client_socket,))
             client_thread.daemon = True
             client_thread.start()
         
-    def client_handle(self,client_socket:socket.socket,server_socket:socket.socket,client_address:str):
-        #INFO Client socket is actually a subsocket created by the server to respond to the actual request.
-        data = int(client_socket.recv(1024))
+    def client_handle(self,client_socket:socket.socket):
+        #INFO Client socket is actually a subsocket created by the server to respond to the actual request
+        #INFO (cont.) /communicate with the real client.
+        sockclose = False
+        while not sockclose:
+            data = client_socket.recv(1024).decode() #Recieve data.
+
+            #Initial info.
+            if not data.startswith("R:"):
+                data = int(data)
 
 
-        if data == 1:
-            #This code is adapted from the save function below
-            for child in self.Pages[self.RandomTabStrings[self.MainEditor.index(CURRENT)]][0].winfo_children():
-                if True:
-                    display = 0
-                if type(child) == cc.IDEText:
-                    display = child
-                client_socket.send("NO-TEXT".encode())
+            if (type(data)!=int) and (data.startswith('R:')): #Connection accepted.
+                client_socket.send("ACCEPT".encode()) 
+            
+            elif data == 0:
+                sockclose = True
+                client_socket.close()
+
+            elif data == 1:
+                #This code is adapted from the save function below
+                display = 0
+                for child in self.Pages[self.RandomTabStrings[self.MainEditor.index(CURRENT)]][0].winfo_children():
+                    if (display == 0): #I feel like this code is demented. I wrote it at 4 am idrk.
+                        display = 0
+                    if type(child) == cc.IDEText:
+                        display = child
+                if display == 0:
+                    client_socket.send("NO-TEXT".encode())
+                else:
+                    client_socket.send(display.get("0.0",END).encode())
             else:
-                client_socket.send(display.get("0.0",END).encode())
-        else:
-            client_socket.send("CODE-INVALID".encode())
-        return 0
+                client_socket.send("CODE-INVALID".encode())
+            
+            
     
     
     def Terminal(self):

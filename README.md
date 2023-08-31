@@ -1,6 +1,6 @@
-# TkIDE  Version 2.1
+# TkIDE  Version 2.2
 
-## huh... i ran out of things to say
+## August goes. School comes. Coding goes down.
 
 <br>
 
@@ -15,8 +15,22 @@
 - ## TkIDE is not an actual IDE. It is a code editor with limited functionality
 
 - ### TkIDE's raw code only works with Python 3.9 and above (as to my knowledge)
+- ### Tested on 3.10/3.11
 
-## Changes  
+## Changelog
+
+- ## 2.2 
+  - File explorer disabled (it didn't work that well)
+  - Added support for extensions again baby!!!!!!!!
+    -  Based on an api, with socket and thread communication in the ide, allowing for multiple extensions, without lag/freezing.
+    - This also at the same time prevents misuse of the ide, because only supported commands will work.
+    - Currently there are 3 commands. 2 are necessary (init and close connection) and one allows for access of currently opened text.
+    - Will expand, tutorial, more commands, documentation etc in next update.
+    - **NOT TESTED ON EXE VERSION**
+  - No executable this version.
+  - Search from right click menu.
+
+
 
 - ## 2.1
 
