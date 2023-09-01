@@ -1,4 +1,4 @@
-# TkIDE  Version 2.2
+# TkIDE  Version 2.2.1
 
 ## August goes. School comes. Coding goes down.
 
@@ -19,6 +19,8 @@
 
 ## Changelog
 
+- ## 2.2.1
+  - Added more commands, read at [commands.md](extensions/commands.md)
 - ## 2.2 
   - File explorer disabled (it didn't work that well)
   - Added support for extensions again baby!!!!!!!!

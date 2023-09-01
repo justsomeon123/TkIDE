@@ -1,4 +1,4 @@
-#INFO Version:2.2 Last Updated:2023-08-31
+#INFO Version:2.2.1 Last Updated:2023-09-1
 #Look at README.md for more information
 #############################################################################################
 #TkIDE.pyw
@@ -30,10 +30,13 @@ class Editor:
     def __init__(self) -> None:
         #SECTION:Setup
         self.root = Tk()
+        self.componentsReady = False
         
 
         with open('./assets/settings.json') as f:
             self.settings = json.load(f)
+        
+
         self.server_init(settings=self.settings)
         #debug check
         debugFlag = True if self.settings["debug"] else False
@@ -109,6 +112,7 @@ class Editor:
 
         #SECTION:Loop
         self.root.mainloop() #Gui loop.
+        self.componentsReady = True
 
     def server_init(self,settings):
         server_thread = threading.Thread(target=self.server,args=())
@@ -118,9 +122,9 @@ class Editor:
 
     def server(self):
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_address = ("localhost",49155) #random aaahhhh port in dynamic range.
+        server_address = ("localhost",49155) #port in dynamic range.
         server_socket.bind(server_address)
-        server_socket.listen(10)
+        server_socket.listen(self.settings["maxExtConnections"])
         deprint("server listening")
         while True:
             client_socket, client_address = server_socket.accept()
@@ -150,7 +154,9 @@ class Editor:
                 sockclose = True
                 client_socket.close()
 
-            elif data == 1:
+            #INFO READ FUNCTIONS BELOW. READ FUNCTIONS START WITH 1.   
+
+            elif data == 11:
                 #This code is adapted from the save function below
                 display = 0
                 for child in self.Pages[self.RandomTabStrings[self.MainEditor.index(CURRENT)]][0].winfo_children():
@@ -162,6 +168,24 @@ class Editor:
                     client_socket.send("NO-TEXT".encode())
                 else:
                     client_socket.send(display.get("0.0",END).encode())
+
+            elif data == 12:
+                #Turns out this also works to get the filename.
+                display = 0
+                for child in self.Pages[self.RandomTabStrings[self.MainEditor.index(CURRENT)]][0].winfo_children():
+                    if (display == 0): #I feel like this code is demented. I wrote it at 4 am idrk.
+                        display = 0
+                    if type(child) == cc.IDEText:
+                        display = child
+                if display == 0:
+                    client_socket.send("NO-FILE".encode())
+                else:
+                    client_socket.send(display.filename.encode())
+            
+            elif data == 13:
+                client_socket.send(str(len(self.MainEditor.tabs())).encode())
+
+            #INFO UNKNOWN CODES
             else:
                 client_socket.send("CODE-INVALID".encode())
             
@@ -279,7 +303,7 @@ class Editor:
         SHBar = Scrollbar(PageFrame, orient = HORIZONTAL)
         SHBar.pack(side = BOTTOM, fill = "x")
 
-        deprint(filename,True)
+        deprint(filename)
 
         Display = cc.IDEText(PageFrame,filename=filename,height = 500, width = 500,yscrollcommand = SVBar.set,xscrollcommand = SHBar.set, wrap = "none")
         Display.pack(expand = 0, fill = BOTH)
