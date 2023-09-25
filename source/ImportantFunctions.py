@@ -1,4 +1,4 @@
-"""Some important functions, mostly just the highlighting function"""
+"""Important functions seperated from the main file."""
 import platform
 from source.CustomClasses import IDEText
 from pygments import lex
@@ -20,8 +20,9 @@ def highlight(Display:IDEText):
 
             Display.tag_add(str(token), start, end)
         except Exception:
-            #very buggy code, so rather than crashing when unable to parse and hhighlight
-            #simply ignore, and don't highlight any text
+            #Because the code has a high chance of failure, rather than crash the program unexpectedly for the user,
+            #simply ignore and don't highlight.
+            #Generalized exception because I don't know all the errors that the code can produce.
             pass
 
 

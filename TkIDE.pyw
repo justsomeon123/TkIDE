@@ -30,7 +30,6 @@ class Editor:
     def __init__(self) -> None:
         #SECTION:Setup
         self.root = Tk()
-        self.componentsReady = False
         
 
         with open('./assets/settings.json') as f:
@@ -87,21 +86,21 @@ class Editor:
         ##SUBSECTION:Menu adding:END
         
         #SECTION:Main Editor
-        self.MainEditorCount = 0 #Tab count.
+        self.TabCount = 0 #Tab count.
         self.Pages = {} #dictionary of pages/tabs and their key values
-        self.RandomTabStrings = [] #Random strings that correspond to each page , look at self.RandomString() for more info.
-        self.MainEditor = cc.CustomNotebook(self.RandomTabStrings,self.Pages) #the main editor interface. (View CustomClasses.CustomNotebook for more information)
-        self.MainEditor.pack(expand=True,fill=BOTH)
+        self.TabIdentifiers = [] #Random strings that correspond to each page , look at self.RandomString() for more info.
+        self.EditorPages = cc.CustomNotebook(self.TabIdentifiers,self.Pages) #the main editor interface. (View CustomClasses.CustomNotebook for more information)
+        self.EditorPages.pack(expand=True,fill=BOTH)
 
 
 
 
         ##SECTION:Welcome Page
         tab_identifier = self.RandomString() #Creates a tab identifier for this tab.
-        self.RandomTabStrings.append(tab_identifier) #Adds it to the storage of tab identifiers.
-        self.Pages[tab_identifier]  = (ttk.Frame(self.MainEditor),"welcomepage") #Stores the informaton on each pages critical parts
+        self.TabIdentifiers.append(tab_identifier) #Adds it to the storage of tab identifiers.
+        self.Pages[tab_identifier]  = (ttk.Frame(self.EditorPages),"welcomepage") #Stores the informaton on each pages critical parts
         PageFrame = self.Pages[tab_identifier][0] #PageFrame is the Frame holding the editor/page content
-        self.MainEditor.add(PageFrame, text=f"Home",image=self.root.MainIcon,compound="left") # Add a tab.
+        self.EditorPages.add(PageFrame, text=f"Home",image=self.root.MainIcon,compound="left") # Add a tab.
         ttk.Label(PageFrame,text="Press these buttons or use the menu at the top").pack(anchor=NW,pady=10) #Buttons on welcome page.
         ttk.Button(PageFrame,text="Open File",command=lambda:self.OpenFile()).pack(anchor=NW)
         ttk.Button(PageFrame,text="Create a New File",command=lambda:self.CreateFile()).pack(anchor=NW)
@@ -112,25 +111,25 @@ class Editor:
 
         #SECTION:Loop
         self.root.mainloop() #Gui loop.
-        self.componentsReady = True
 
-    def server_init(self,settings):
-        server_thread = threading.Thread(target=self.server,args=())
-        server_thread.daemon = True #background thread
+    def ext_server_init(self,settings):
+        self.extension_connections = {}
+        self.server_thread = threading.Thread(target=self.ext_server,args=())
+        self.server_thread.daemon = True #background thread
         if settings["extensionsEnabled"]:
-            server_thread.start()
+            self.server_thread.start()
 
-    def server(self):
+    def ext_server(self):
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_address = ("localhost",49155) #port in dynamic range.
         server_socket.bind(server_address)
-        server_socket.listen(self.settings["maxExtConnections"])
+        server_socket.listen(self.settings["maxExtConnections"]*2) #Double it so that each extension can listen to events.
         deprint("server listening")
         while True:
-            client_socket, client_address = server_socket.accept()
+            client_socket, client_address = server_socket.accept() #Client socket is the socket created by the server to communicate with the client.
             deprint(f"client connect:{client_address}")
 
-            #istg if this doesn't work
+            #Starts a thread to handle the client called client thread
             client_thread = threading.Thread(target=self.client_handle,args=(client_socket,))
             client_thread.daemon = True
             client_thread.start()
@@ -138,17 +137,20 @@ class Editor:
     def client_handle(self,client_socket:socket.socket):
         #INFO Client socket is actually a subsocket created by the server to respond to the actual request
         #INFO (cont.) /communicate with the real client.
+
         sockclose = False
         while not sockclose:
             data = client_socket.recv(1024).decode() #Recieve data.
 
             #Initial info.
-            if not data.startswith("R:"):
+            if not data.startswith("ER:"):
                 data = int(data)
 
 
-            if (type(data)!=int) and (data.startswith('R:')): #Connection accepted.
-                client_socket.send("ACCEPT".encode()) 
+            if (type(data)!=int) and (data.startswith('ER:')): #Connection accepted.
+                idn = self.RandomString()
+                client_socket.send(f"{idn}".encode())
+                self.extension_connections[idn] = data.removeprefix('ER:')
             
             elif data == 0:
                 sockclose = True
@@ -159,7 +161,7 @@ class Editor:
             elif data == 11:
                 #This code is adapted from the save function below
                 display = 0
-                for child in self.Pages[self.RandomTabStrings[self.MainEditor.index(CURRENT)]][0].winfo_children():
+                for child in self.Pages[self.TabIdentifiers[self.EditorPages.index(CURRENT)]][0].winfo_children():
                     if (display == 0): #I feel like this code is demented. I wrote it at 4 am idrk.
                         display = 0
                     if type(child) == cc.IDEText:
@@ -172,7 +174,7 @@ class Editor:
             elif data == 12:
                 #Turns out this also works to get the filename.
                 display = 0
-                for child in self.Pages[self.RandomTabStrings[self.MainEditor.index(CURRENT)]][0].winfo_children():
+                for child in self.Pages[self.TabIdentifiers[self.EditorPages.index(CURRENT)]][0].winfo_children():
                     if (display == 0): #I feel like this code is demented. I wrote it at 4 am idrk.
                         display = 0
                     if type(child) == cc.IDEText:
@@ -183,7 +185,7 @@ class Editor:
                     client_socket.send(display.filename.encode())
             
             elif data == 13:
-                client_socket.send(str(len(self.MainEditor.tabs())).encode())
+                client_socket.send(str(len(self.EditorPages.tabs())).encode())
 
             #INFO UNKNOWN CODES
             else:
@@ -199,8 +201,8 @@ class Editor:
     #SECTION:SAVE   
     def Save(self):
         "Quick code to save current editor (text) state to the file."
-        index = self.MainEditor.index(CURRENT)
-        tab_identifier = self.RandomTabStrings[index]
+        index = self.EditorPages.index(CURRENT)
+        tab_identifier = self.TabIdentifiers[index]
         Frame = self.Pages[tab_identifier][0]
         children = Frame.winfo_children()
 
@@ -287,14 +289,14 @@ class Editor:
             filecontent= f.read()
         
         #@ I don't even know. This code is unreadable. Please send help.
-        self.MainEditorCount += 1
+        self.TabCount += 1
         tab_identifier = self.RandomString()
-        self.RandomTabStrings.append(tab_identifier)
-        self.Pages[tab_identifier]  = (ttk.Frame(self.MainEditor),filename)
+        self.TabIdentifiers.append(tab_identifier)
+        self.Pages[tab_identifier]  = (ttk.Frame(self.EditorPages),filename)
         PageFrame = self.Pages[tab_identifier][0]        
 
 
-        self.MainEditor.add(PageFrame, text=f"{filename.split('/')[-1]}",image=self.root.FileIcon,compound="left")
+        self.EditorPages.add(PageFrame, text=f"{filename.split('/')[-1]}",image=self.root.FileIcon,compound="left")
 
 
 
@@ -327,18 +329,18 @@ class Editor:
 
 
     def ImageTab(self,filename):
-        self.MainEditorCount += 1
+        self.TabCount += 1
         tab_identifier = self.RandomString()
-        self.RandomTabStrings.append(tab_identifier)
-        self.Pages[tab_identifier]  = (ttk.Frame(self.MainEditor),filename)
+        self.TabIdentifiers.append(tab_identifier)
+        self.Pages[tab_identifier]  = (ttk.Frame(self.EditorPages),filename)
         PageFrame = self.Pages[tab_identifier][0]
-        self.MainEditor.add(PageFrame, text=f"{filename.split('/')[-1]}",image=self.root.ImageIcon,compound="left") 
+        self.EditorPages.add(PageFrame, text=f"{filename.split('/')[-1]}",image=self.root.ImageIcon,compound="left") 
         #@ ^  creating a tab for the image holder.
 
         #WARN size can't be zero
         
         #@ v resize the image until it fits inside without being too big.
-        size=self.settings['ImageScaleSize']
+        size=self.settings['imageResizeCoeffiecent']
         image = Image.open(filename)
         if image.size[0] * size < PageFrame.winfo_screenwidth(): 
             if image.size[1] * size < PageFrame.winfo_screenheight():        

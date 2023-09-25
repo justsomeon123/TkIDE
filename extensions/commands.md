@@ -9,11 +9,18 @@ Then, run the intiate function with the name of your program.
 
 <code>api.InitiateConnection("programname")</code>
 
-This name should be unique, and preferably lowercase.
+This name should be unique, and preferably lowercase, although this doesn't really affect anything as of now.
 
 Once you're done with what your extension/app wanted to do, use the following command to close the connection.
 
 <code>api.ExitConnection()</code>
+
+Which will neatly close the connection and threads connected to it.
+
+## Registering for Events
+ - Expand
+## Event Codes
+ - Expand
 
 ## Read Commands
 - ### GetEditorText

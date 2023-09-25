@@ -1,3 +1,5 @@
+"""Code for the 2 embedded terminals. Unfinished/In Progress"""
+
 import tkinter as tk
 import sys,subprocess
 

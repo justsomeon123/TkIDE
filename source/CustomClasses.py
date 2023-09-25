@@ -1,4 +1,4 @@
-"""Some code for classes like IDEText"""
+"""Code for classes stored outside of the main file."""
 #Most of the code here is adapted from stackoverflow to fit my needs.
 
 import os
@@ -30,8 +30,6 @@ class IDEText(Text):
         self.tag_configure("Token.Literal.Number.Integer", foreground="#fc8c03")
         self.tag_configure("Token.Comment.Single", foreground="#bbbbbb")
         self.tag_configure("Token.Literal.Boolean", foreground="#a3F133")
-
-#for the first time, i am going to start this withot stackoverflow
 
 
 
