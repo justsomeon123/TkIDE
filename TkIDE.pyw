@@ -36,7 +36,7 @@ class Editor:
             self.settings = json.load(f)
         
 
-        self.server_init(settings=self.settings)
+        self.ext_server_init(settings=self.settings)
         #debug check
         debugFlag = True if self.settings["debug"] else False
         
@@ -133,6 +133,10 @@ class Editor:
             client_thread = threading.Thread(target=self.client_handle,args=(client_socket,))
             client_thread.daemon = True
             client_thread.start()
+    
+    def event_msg(self, code):
+        for client_pairs in self.extension_connections: 
+            client_pairs[2].send(f"SE:{code}".encode())
         
     def client_handle(self,client_socket:socket.socket):
         #INFO Client socket is actually a subsocket created by the server to respond to the actual request
@@ -143,14 +147,18 @@ class Editor:
             data = client_socket.recv(1024).decode() #Recieve data.
 
             #Initial info.
-            if not data.startswith("ER:"):
+            if not data.startswith("ER:") or not data.startswith("ELR:"):
                 data = int(data)
 
 
             if (type(data)!=int) and (data.startswith('ER:')): #Connection accepted.
                 idn = self.RandomString()
                 client_socket.send(f"{idn}".encode())
-                self.extension_connections[idn] = data.removeprefix('ER:')
+                self.extension_connections[idn] = [data.removeprefix('ER'),client_socket]
+            
+            if (type(data)!=int) and (data.startswith('ELR:')):
+                idn = data.removeprefix("ELR:") #Event Listener for extension with code idn.
+                self.extension_connections[idn].append(client_socket)
             
             elif data == 0:
                 sockclose = True
