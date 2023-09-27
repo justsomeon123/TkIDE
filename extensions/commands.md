@@ -31,12 +31,13 @@ The second argument is the event functions. It is a dictionary of functions that
  - Simply pass the second argument in the initializing function as a dict of format:
  - ``` py 
     {"event_code":["event_func","event_func1"...],"event_code2":["event2_func",...],...}
- ```
+   ```
+
 ## Event Codes
  - ### 001:
     - On File Open
  - ### 002:
-    - On File
+    - On File Content Change
 
 ## Read Commands
 - ### GetEditorText
