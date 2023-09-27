@@ -1,6 +1,11 @@
+import tkinter.messagebox as msgbox
+
 import extapi as api
-ext = api.APIInstance("test")  # Initialize the connection before calling GetEditorText()
-print(ext.GetEditorText())
-print(ext.GetFileName())
-ext.ExitConnection()
-del ext
+
+
+class Test(api.APIInstance):
+
+    def window_OnFileOpen(self):
+        msgbox.showinfo("Info", "File Opened")
+    
+x = Test("Test",{"001":["window_OnFileOpen"]})
