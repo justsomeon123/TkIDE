@@ -6,7 +6,7 @@
 
 # Disclaimers
 
-- ## **WARNING**: TkIDE is a work in progress project. I am not responsible for any damage done to your computer
+- ## **WARNING**: TkIDE is a work in progress project. I am not responsible for any damage done to your computer by extensions
 
 - ## **Beware!**
 
