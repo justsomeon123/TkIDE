@@ -231,7 +231,7 @@ class Editor:
             return
         deprint(filename)
         self.NewTab(filename)
-        self.event_msg(001)
+        self.event_msg(1)
 
     def CreateFile(self):
         "Dialog for creating a new file"

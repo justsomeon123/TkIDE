@@ -34,9 +34,9 @@ The second argument is the event functions. It is a dictionary of functions that
    ```
 
 ## Event Codes
- - ### 001:
+ - ### 1:
     - On File Open
- - ### 002:
+ - ### 2:
     - On File Content Change
 
 ## Read Commands
