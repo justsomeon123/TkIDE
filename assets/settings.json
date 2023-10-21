@@ -4,7 +4,7 @@
     "image-icon":"./assets/image.png",
     "imageResizeCoeffiecent":8,
     "enableHighlighting":false,
-    "debug":false,
+    "debug":true,
     "extensionsEnabled":true,
     "maxExtConnections":10
 }

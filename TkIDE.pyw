@@ -20,11 +20,6 @@ from PIL import Image, ImageTk
 import source.CustomClasses as cc
 import source.ImportantFunctions
 
-debugFlag = False
-
-def deprint(text,debug=debugFlag):
-    if debug:
-        print(text)
 
 class Editor:
     def __init__(self) -> None:
@@ -37,10 +32,7 @@ class Editor:
         
 
         self.ext_server_init(settings=self.settings)
-        #debug check
-        debugFlag = True if self.settings["debug"] else False
-        
-                
+            
 
         #SECTION:Icons
         self.root.MainIcon = ImageTk.PhotoImage(Image.open(self.settings["icon"]),Image.Resampling.NEAREST)
@@ -112,6 +104,10 @@ class Editor:
         #SECTION:Loop
         self.root.mainloop() #Gui loop.
 
+    def deprint(self,text):
+        if self.settings["debug"]:
+            print(text)
+    
     def ext_server_init(self,settings):
         self.extension_connections = {}
         self.server_thread = threading.Thread(target=self.ext_server,args=())
@@ -124,10 +120,10 @@ class Editor:
         server_address = ("localhost",49155) #port in dynamic range.
         server_socket.bind(server_address)
         server_socket.listen(self.settings["maxExtConnections"]*2) #Double it so that each extension can listen to events.
-        deprint("server listening")
+        self.deprint("server listening")
         while True:
             client_socket, client_address = server_socket.accept() #Client socket is the socket created by the server to communicate with the client.
-            deprint(f"client connect:{client_address}")
+            self.deprint(f"client connect:{client_address}")
 
             #Starts a thread to handle the client called client thread
             client_thread = threading.Thread(target=self.client_handle,args=(client_socket,))
@@ -135,8 +131,8 @@ class Editor:
             client_thread.start()
     
     def event_msg(self, code):
-        for client_pairs in self.extension_connections: 
-            client_pairs[2].send(f"SE:{code}".encode())
+        for client_pairs in self.extension_connections.values(): 
+            client_pairs[1].send(f"SE:{code}".encode())
         
     def client_handle(self,client_socket:socket.socket):
         #INFO Client socket is actually a subsocket created by the server to respond to the actual request
@@ -147,16 +143,16 @@ class Editor:
             data = client_socket.recv(1024).decode() #Recieve data.
 
             #Initial info.
-            if not data.startswith("ER:") or not data.startswith("ELR:"):
+            if not data.startswith("ER:") and not data.startswith("ELR:"):
                 data = int(data)
 
 
-            if (type(data)!=int) and (data.startswith('ER:')): #Connection accepted.
+            elif (type(data)!=int) and (data.startswith('ER:')): #Connection accepted.
                 idn = self.RandomString()
                 client_socket.send(f"{idn}".encode())
-                self.extension_connections[idn] = [data.removeprefix('ER'),client_socket]
+                self.extension_connections[idn] = [data.removeprefix('ER:'),client_socket]
             
-            if (type(data)!=int) and (data.startswith('ELR:')):
+            elif (type(data)!=int) and (data.startswith('ELR:')):
                 idn = data.removeprefix("ELR:") #Event Listener for extension with code idn.
                 self.extension_connections[idn].append(client_socket)
             
@@ -229,7 +225,7 @@ class Editor:
         if filename.endswith(("png","gif","jpg","jpeg","ico")):
             self.ImageTab(filename)
             return
-        deprint(filename)
+        self.deprint(filename)
         self.NewTab(filename)
         self.event_msg(1)
 
@@ -261,12 +257,12 @@ class Editor:
     def PopupMenu(self,event:Event):
         def copy():
             event.widget.clipboard_clear()
-            deprint(event.widget.selection_get())
+            self.deprint(event.widget.selection_get())
             event.widget.clipboard_append(event.widget.selection_get())
         
         def cut():
             event.widget.clipboard_clear()
-            deprint(event.widget.selection_get())
+            self.deprint(event.widget.selection_get())
             event.widget.delete("sel.first","sel.last")
             event.widget.clipboard_append(event.widget.selection_get())
         
@@ -314,7 +310,7 @@ class Editor:
         SHBar = Scrollbar(PageFrame, orient = HORIZONTAL)
         SHBar.pack(side = BOTTOM, fill = "x")
 
-        deprint(filename)
+        self.deprint(filename)
 
         Display = cc.IDEText(PageFrame,filename=filename,height = 500, width = 500,yscrollcommand = SVBar.set,xscrollcommand = SHBar.set, wrap = "none")
         Display.pack(expand = 0, fill = BOTH)
