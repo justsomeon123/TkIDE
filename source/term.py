@@ -25,15 +25,18 @@ class TerminalWindow:
         self.entry.bind('<Return>', self.on_return)
         self.entry.focus()
         
-        self.text.insert(tk.END, ">>> ")
+        self.print( ">>> ")
         
     def on_return(self, event):
         # get the user input and process it
         user_input = self.entry.get()
-        self.text.insert(tk.END, user_input + '\n')
+        self.print( user_input + '\n')
         self.entry.delete(0, tk.END)
         self.process_command(user_input)
-        self.text.insert(tk.END, ">>> ")
+        self.print( ">>> ")
+    
+    def print(self,value):
+        self.text.insert(tk.END, value)
         
     def process_command(self, command:str):
         
@@ -44,24 +47,25 @@ class TerminalWindow:
             try:
                 z = command.removeprefix("newtab").strip()
                 self.parent.NewTab(z)
-                self.text.insert(tk.END,f"Created tab for file {z}\n")
+                self.print(f"Created tab for file {z}\n")
             except Exception:
-                self.text.insert(tk.END,f"Error, add a filename. Ex:newtab C:/Users/user/test.txt\n")
+                self.print(f"Error, add a filename. Ex:newtab C:/Users/user/test.txt\n")
             return 0
         
         if command == "term":
             TrueTerminalWindow() 
+            return 0
 
         if command.startswith("importcmd"):
+            self.print(f"Not supported yet.\n")
             try:
                 z = command.removeprefix("importcmd").strip()
-
             except Exception:
-                self.text.insert(tk.END,f"Error, add a filename. Ex:importcmd C:/Users/user/cmd.json\n")
+                self.print(f"Error, add a filename. Ex:importcmd C:/Users/user/cmd.json\n")
             return 0
         
         else:
-            self.text.insert(tk.END, f"Error: command \"{command}\" not known \n")
+            self.print( f"Error: command \"{command}\" not known \n")
 
 
 

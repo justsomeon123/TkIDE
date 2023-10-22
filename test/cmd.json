@@ -1,0 +1,8 @@
+{
+    "name":"cmd",
+    "request":["x"],
+    "process":{
+        "add":["x",321,"y"]
+    },
+    "return":["y"]
+}

@@ -18,6 +18,7 @@ from tkinter import (BOTH, BOTTOM, CURRENT, END, HORIZONTAL, NW, RIGHT, Button,
 from PIL import Image, ImageTk
 
 import source.CustomClasses as cc
+import source.term as Terminal
 import source.ImportantFunctions
 
 
@@ -131,8 +132,12 @@ class Editor:
             client_thread.start()
     
     def event_msg(self, code):
-        for client_pairs in self.extension_connections.values(): 
-            client_pairs[1].send(f"SE:{code}".encode())
+        #connection_key is the uid for each connection. self.extension_connections[connection_key] -> [""]
+        for connection_key in self.extension_connections: 
+            try:
+                self.extension_connections[connection_key][1].send(f"SE:{code}".encode())
+            except ConnectionAbortedError:
+                self.extension_connections.pop(self.extension_connections[connection_key])
         
     def client_handle(self,client_socket:socket.socket):
         #INFO Client socket is actually a subsocket created by the server to respond to the actual request
@@ -199,7 +204,7 @@ class Editor:
     
     
     def Terminal(self):
-        cc.TerminalWindow(self)
+        Terminal.TerminalWindow(self)
 
 
     #SECTION:SAVE   
