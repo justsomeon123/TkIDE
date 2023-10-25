@@ -13,14 +13,14 @@ class APIInstance:
         try:
             event_socket.connect(server_address)
             event_socket.send(("ELR:" + id).encode())
-            event_socket.timeout = 2000 #setting this prevents the extension from instantly crashing.Gives server 2000 seconds to respond.
+            #event_socket.timeout = 2000 #setting this prevents the extension from instantly crashing.Gives server 2000 seconds to respond.
             
             while not self.closed: 
                 pos_event = event_socket.recv(1024).decode()
                 if pos_event.startswith("SE:"):
                     event_code = pos_event.removeprefix("SE:")
                     for executor in events[event_code]:
-                        eval(f"self.{executor}",{"self":self}) 
+                        eval(f"self.{executor}()",{"self":self}) 
                 else:
                     continue
 
@@ -38,8 +38,7 @@ class APIInstance:
             client_socket.send(("ER:" + name).encode())
             self._idn = client_socket.recv(1024).decode()
             self._client = client_socket
-            print(self.GetEditorText())
-            threading.Thread(target=self._eventlistener,args=(events,self._idn),daemon=True).start()
+            threading.Thread(target=self._eventlistener,args=(events,self._idn)).start()
         except ConnectionRefusedError:
             raise ConnectionRefusedError
         

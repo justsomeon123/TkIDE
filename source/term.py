@@ -73,7 +73,7 @@ class TerminalWindow:
 class TrueTerminalWindow():
     def __init__(self):
         self.main = tk.Toplevel()
-        self.main.title("Terminal Window (PLEASE NOTE, WON'T WORK WITH EVERYTHING!)")
+        self.main.title("Terminal Window (MAY NOT WORK!)")
         self.ttext = tk.Text(self.main)
         self.ttext.bind("<Button-1>", lambda e: "break")
         self.ttext.bind("<Key>", lambda e: "break")
