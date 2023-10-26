@@ -5,14 +5,14 @@ import threading
 
 class APIInstance:
 
-    def _eventlistener(self,events,id):
+    def _eventlistener(self,events,idn):
         event_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print(self._idn)
         server_address = ('localhost', 49155)  # Default server address
 
         try:
             event_socket.connect(server_address)
-            event_socket.send(("ELR:" + id).encode())
+            event_socket.send(("ELR:" + idn).encode())
             #event_socket.timeout = 2000 #setting this prevents the extension from instantly crashing.Gives server 2000 seconds to respond.
             
             while not self.closed: 

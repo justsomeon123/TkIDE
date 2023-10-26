@@ -247,8 +247,8 @@ class Editor:
         self.deleteroot.title('Are you sure?!')
         Label(self.deleteroot,text="Are you sure that you want to delete a file?").pack()
         Label(self.deleteroot,text="(Ireversible)",foreground="red").pack()
-        self.DeleteButton = Button(self.deleteroot,text="Delete",foreground="red",activeforeground="dark red",background="dark red",activebackground="red",command=lambda:self.DeleteFile()).pack()
-        self.CancelButton = Button(self.deleteroot,text="Cancel",command=lambda:self.deleteroot.destroy()).pack()
+        Button(self.deleteroot,text="Delete",foreground="red",activeforeground="dark red",background="dark red",activebackground="red",command=lambda:self.DeleteFile()).pack()
+        Button(self.deleteroot,text="Cancel",command=lambda:self.deleteroot.destroy()).pack()
     
     def DeleteFile(self):
         filename = filedialog.askopenfilename(initialdir = '/',title    = "Choose file to delete",)
@@ -281,6 +281,8 @@ class Editor:
             from urllib.parse import quote
             from webbrowser import open as browseropen
             browseropen(f"https://www.google.com/?q={quote(event.widget.selection_get())}")
+            del quote
+            del browseropen
             #always be secure kids!
    
             
