@@ -1,3 +1,5 @@
+"""Old Code to provide an entrance point for extensions to access values in the IDE."""
+
 import socket
 import threading
 

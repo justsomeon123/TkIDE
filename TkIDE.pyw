@@ -1,4 +1,4 @@
-#INFO Version:2.2.1 Last Updated:2023-09-1
+#Version:2.3.2 Last Updated:2023-10-28
 #Look at README.md for more information
 #############################################################################################
 #TkIDE.pyw
@@ -9,7 +9,7 @@ import os
 import random
 import socket
 import string
-import threading  # Extension communication.
+import threading
 from tkinter import (BOTH, BOTTOM, CURRENT, END, HORIZONTAL, NW, RIGHT, Button,
                      Event, Label, Menu, Scrollbar, Tk, Toplevel, filedialog,
                      messagebox, ttk)
@@ -17,9 +17,10 @@ from tkinter import (BOTH, BOTTOM, CURRENT, END, HORIZONTAL, NW, RIGHT, Button,
 #Make sure pil is always imported after any modules with a class called Image or ImageTk
 from PIL import Image, ImageTk
 
+#Internal imports
 import source.CustomClasses as cc
-import source.term as Terminal
 import source.ImportantFunctions
+import source.term as Terminal
 
 
 class Editor:
@@ -35,7 +36,7 @@ class Editor:
         self.ext_server_init(settings=self.settings)
             
 
-        #SECTION:Icons
+        #SECTION:Icons 
         self.root.MainIcon = ImageTk.PhotoImage(Image.open(self.settings["icon"]),Image.Resampling.NEAREST)
         self.root.FileIcon = ImageTk.PhotoImage(Image.open(self.settings["file-icon"]),Image.Resampling.NEAREST)
         self.root.ImageIcon = ImageTk.PhotoImage(Image.open(self.settings["image-icon"]),Image.Resampling.NEAREST)
@@ -127,7 +128,10 @@ class Editor:
             self.deprint(f"client connect:{client_address}")
 
             #Starts a thread to handle the client called client thread
-            client_thread = threading.Thread(target=self.client_handle,args=(client_socket,))
+            if self.settings["experimentalExtensions"]:
+                client_thread = threading.Thread(target=self.client_handle,args=(client_socket,))
+            else:
+                client_thread = threading.Thread(target=self.old_client_handle,args=(client_socket,))
             client_thread.daemon = True
             client_thread.start()
     
@@ -138,7 +142,66 @@ class Editor:
                 self.extension_connections[connection_key][1].send(f"SE:{code}".encode())
             except ConnectionAbortedError:
                 self.extension_connections.pop(self.extension_connections[connection_key])
-        
+    
+    def old_client_handle(self,client_socket:socket.socket):
+        #NOTE: Old code that doesn't support events, but also works completely as expected.
+
+        #INFO Client socket is actually a subsocket created by the server to respond to the actual request
+        #INFO (cont.) /communicate with the real client.
+
+        sockclose = False
+        while not sockclose:
+            data = client_socket.recv(1024).decode() #Recieve data.
+
+            #Initial info.
+            if not data.startswith("ER:"):
+                data = int(data)
+
+
+            if (type(data)!=int) and (data.startswith('ER:')): #Connection accepted.
+                idn = self.RandomString()
+                client_socket.send(f"{idn}".encode())
+                self.extension_connections[idn] = data.removeprefix('ER:')
+            
+            elif data == 0:
+                sockclose = True
+                client_socket.close()
+
+            #INFO READ FUNCTIONS BELOW. READ FUNCTIONS START WITH 1.   
+
+            elif data == 11:
+                #This code is adapted from the save function below
+                display = 0
+                for child in self.Pages[self.TabIdentifiers[self.EditorPages.index(CURRENT)]][0].winfo_children():
+                    if (display == 0): #I feel like this code is demented. I wrote it at 4 am idrk.
+                        display = 0
+                    if type(child) == cc.IDEText:
+                        display = child
+                if display == 0:
+                    client_socket.send("NO-TEXT".encode())
+                else:
+                    client_socket.send(display.get("0.0",END).encode())
+
+            elif data == 12:
+                #Turns out this also works to get the filename.
+                display = 0
+                for child in self.Pages[self.TabIdentifiers[self.EditorPages.index(CURRENT)]][0].winfo_children():
+                    if (display == 0): #I feel like this code is demented. I wrote it at 4 am idrk.
+                        display = 0
+                    if type(child) == cc.IDEText:
+                        display = child
+                if display == 0:
+                    client_socket.send("NO-FILE".encode())
+                else:
+                    client_socket.send(display.filename.encode())
+            
+            elif data == 13:
+                client_socket.send(str(len(self.EditorPages.tabs())).encode())
+
+            #INFO UNKNOWN CODES
+            else:
+                client_socket.send("CODE-INVALID".encode())
+
     def client_handle(self,client_socket:socket.socket):
         #INFO Client socket is actually a subsocket created by the server to respond to the actual request
         #INFO (cont.) /communicate with the real client.
@@ -200,14 +263,9 @@ class Editor:
             else:
                 client_socket.send("CODE-INVALID".encode())
             
-            
-    
-    
     def Terminal(self):
         Terminal.TerminalWindow(self)
-
-
-    #SECTION:SAVE   
+ 
     def Save(self):
         "Quick code to save current editor (text) state to the file."
         index = self.EditorPages.index(CURRENT)
@@ -336,10 +394,6 @@ class Editor:
             source.ImportantFunctions.highlight(Display)
             self.root.bind("<KeyRelease>",lambda event: source.ImportantFunctions.highlight(Display))
 
-            
-
-
-
     def ImageTab(self,filename):
         self.TabCount += 1
         tab_identifier = self.RandomString()
@@ -367,8 +421,6 @@ class Editor:
         label.image = img #WARN required for image to appear
         label.pack()
 
-        
-    
 
 
 if __name__ == "__main__":

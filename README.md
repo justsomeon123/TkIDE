@@ -1,4 +1,4 @@
-# TkIDE  Version 2.2.1
+# TkIDE  Version 2.3.2
 
 ## August goes. School comes. Coding goes down.
 
@@ -6,7 +6,7 @@
 
 # Disclaimers
 
-- ## **WARNING**: TkIDE is a work in progress project. I am not responsible for any damage done to your computer by extensions
+- ## **WARNING**: TkIDE is a work in progress project. I am not responsible for any damage done to your computer by extensions, or by bugged code.
 
 - ## **Beware!**
 

@@ -6,5 +6,6 @@
     "enableHighlighting":false,
     "debug":true,
     "extensionsEnabled":true,
+    "experimentalExtensions":false,
     "maxExtConnections":10
 }
