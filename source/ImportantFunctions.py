@@ -10,20 +10,19 @@ def highlight(Display:IDEText):
     Display.mark_set("range_start", "1.0")
     _lex = lexers.get_lexer_for_filename(Display.filename)
 
-    data = Display.get(Display.index("insert").split(".")[0]+".0",Display.index("insert").split(".")[0]+".end")
-    for token, content in lex(data,_lex):
-        try:
-            print(token)
-            start = Display.search(content,Display.index("insert").split(".")[0]+".0",Display.index("insert").split(".")[0]+".end")
-            end = start.split(".")[0] + "." + str(int(start.split(".")[1]) + len(content))
-            print(f"{start},{end}")
+    line_num = Display.index("insert").split(".")[0]
+    line_bgn = line_num + ".0"
+    line_end = line_num + ".end"
 
-            Display.tag_add(str(token), start, end)
-        except Exception:
-            #Because the code has a high chance of failure, rather than crash the program unexpectedly for the user,
-            #simply ignore and don't highlight.
-            #Generalized exception because I don't know all the errors that the code can produce.
-            pass
+    data = Display.get(line_bgn,line_end)
+    for token, content in lex(data,_lex):
+        print(token)
+        start = Display.search(content,line_bgn,line_end) #Finds the index at which the current token starts
+        if not start:
+            break
+        print(start)
+        end = line_num + "." + str(int(start.split(".")[1]) + len(content)) #Finds the end of the current token using the length of the token
+        Display.tag_add(str(token), start, end)
 
 
 

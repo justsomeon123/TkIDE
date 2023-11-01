@@ -3,9 +3,9 @@
     "file-icon":"./assets/file.png",
     "image-icon":"./assets/image.png",
     "imageResizeCoeffiecent":8,
-    "enableHighlighting":false,
+    "enableHighlighting":true,
     "debug":true,
     "extensionsEnabled":true,
-    "experimentalExtensions":false,
+    "experimentalExtensions":true,
     "maxExtConnections":10
 }

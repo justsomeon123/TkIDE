@@ -60,22 +60,22 @@ class Editor:
         #SECTION:Menus  
         self.Menu = Menu(self.root)
         ##SUBSECTION:File Menu
-        self.FileMenu = Menu(self.Menu,tearoff=0)
-        self.FileMenu.add_command(label='Open File',command=lambda:self.OpenFile())
-        self.FileMenu.add_command(label='Create a New File',command=lambda:self.CreateFile())
-        self.FileMenu.add_command(label="Save",command=lambda:self.Save())
-        self.FileMenu.add_separator(background="red")
-        self.FileMenu.add_command(label="Delete a File",foreground="red",command=lambda:self.DeleteFileConfirm(),background="dark red")
+        FileMenu = Menu(self.Menu,tearoff=0)
+        FileMenu.add_command(label='Open File',command=lambda:self.OpenFile())
+        FileMenu.add_command(label='Create a New File',command=lambda:self.CreateFile())
+        FileMenu.add_command(label="Save",command=lambda:self.Save())
+        FileMenu.add_separator(background="red")
+        FileMenu.add_command(label="Delete a File",foreground="red",command=lambda:self.DeleteFileConfirm(),background="dark red")
         ##SUBSECTION:File Menu:END
 
         ##SUBSECTION:Terminal Menu
-        self.TerminalMenu = Menu(self.Menu,tearoff=0)
-        self.TerminalMenu.add_command(label='Terminal',command=lambda:self.Terminal())
+        TerminalMenu = Menu(self.Menu,tearoff=0)
+        TerminalMenu.add_command(label='Terminal',command=lambda:self.Terminal())
         ##SUBSECTION:Terminal Menu:END
 
         ##SUBSECTION:Menu adding
-        self.Menu.add_cascade(label="File",menu=self.FileMenu)
-        self.Menu.add_cascade(label="Terminal",menu=self.TerminalMenu)
+        self.Menu.add_cascade(label="File",menu=FileMenu)
+        self.Menu.add_cascade(label="Terminal",menu=TerminalMenu)
         self.root.config(menu=self.Menu)
         ##SUBSECTION:Menu adding:END
         

@@ -30,6 +30,8 @@ class IDEText(Text):
         self.tag_configure("Token.Literal.Number.Integer", foreground="#fc8c03")
         self.tag_configure("Token.Comment.Single", foreground="#bbbbbb")
         self.tag_configure("Token.Literal.Boolean", foreground="#a3F133")
+        self.tag_configure("Token.Error",underline=True,foreground="#a23312")
+        
 
 
 
