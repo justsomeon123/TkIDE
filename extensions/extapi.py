@@ -7,25 +7,21 @@ class APIInstance:
 
     def _eventlistener(self,events,idn):
         event_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print(self._idn)
         server_address = ('localhost', 49155)  # Default server address
 
-        try:
-            event_socket.connect(server_address)
-            event_socket.send(("ELR:" + idn).encode())
-            #event_socket.timeout = 2000 #setting this prevents the extension from instantly crashing.Gives server 2000 seconds to respond.
-            
-            while not self.closed: 
-                pos_event = event_socket.recv(1024).decode()
-                if pos_event.startswith("SE:"):
-                    event_code = pos_event.removeprefix("SE:")
-                    for executor in events[event_code]:
-                        eval(f"self.{executor}()",{"self":self}) 
-                else:
-                    continue
-
-        except ConnectionRefusedError:
-            raise ConnectionRefusedError
+        event_socket.connect(server_address)
+        event_socket.send(("ELR:" + idn).encode())
+        #event_socket.timeout = 2000 #setting this prevents the extension from instantly crashing.Gives server 2000 seconds to respond.
+        
+        while not self.closed: 
+            pos_event = event_socket.recv(1024).decode()
+            if pos_event.startswith("SE:"):
+                print("yay")
+                event_code = pos_event.removeprefix("SE:")
+                for executor in events[event_code]:
+                    eval(f"self.{executor}()",{"self":self}) 
+            else:
+                continue
 
 
     def __init__(self,name: str,events:dict):
@@ -37,6 +33,7 @@ class APIInstance:
             client_socket.connect(server_address)
             client_socket.send(("ER:" + name).encode())
             self._idn = client_socket.recv(1024).decode()
+            print(self._idn)
             self._client = client_socket
             threading.Thread(target=self._eventlistener,args=(events,self._idn)).start()
         except ConnectionRefusedError:
@@ -48,17 +45,20 @@ class APIInstance:
             response = self._client.recv(1024)
             if code != 0:
                 return response
-        except ConnectionRefusedError:
-            raise ConnectionRefusedError
+        except ConnectionRefusedError or ConnectionResetError:
+            raise ConnectionError("something went wrong in the server-client connection.")
+
+
+    
 
     def GetEditorText(self) -> str:
-        return self._request(11)
+        return threading.Thread(target=self._request, args=(11)).start()
 
     def GetFileName(self) -> str:
-        return self._request(12)
+        return threading.Thread(target=self._request, args=(12)).start()
 
     def TabCount(self) -> int:
-        return int(self._request(13))
+        return int(threading.Thread(target=self._request, args=(13)).start())
 
     def ExitConnection(self) -> None:
         self.closed = True

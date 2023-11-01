@@ -139,7 +139,7 @@ class Editor:
         #connection_key is the uid for each connection. self.extension_connections[connection_key] -> [""]
         for connection_key in self.extension_connections: 
             try:
-                self.extension_connections[connection_key][1].send(f"SE:{code}".encode())
+                self.extension_connections[connection_key][2].send(f"SE:{code}".encode())
             except ConnectionAbortedError:
                 self.extension_connections.pop(self.extension_connections[connection_key])
     

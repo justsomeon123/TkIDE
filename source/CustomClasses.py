@@ -27,6 +27,7 @@ class IDEText(Text):
         self.tag_configure("Token.Name.Function", foreground="#003D99")
         self.tag_configure("Token.Operator", foreground="#CC7A00")
         self.tag_configure("Token.Literal.String.Single", foreground="#248F24")
+        self.tag_configure("Token.Literal.String.Double", foreground="#248F24")
         self.tag_configure("Token.Literal.Number.Integer", foreground="#fc8c03")
         self.tag_configure("Token.Comment.Single", foreground="#bbbbbb")
         self.tag_configure("Token.Literal.Boolean", foreground="#a3F133")
