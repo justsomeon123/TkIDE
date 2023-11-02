@@ -3,6 +3,7 @@
 import socket
 import threading
 
+
 class APIInstance:
 
     def _eventlistener(self,events,idn):
@@ -39,26 +40,32 @@ class APIInstance:
         except ConnectionRefusedError:
             raise ConnectionRefusedError
         
-    def _request(self,code: int):
-        try:
-            self._client.send(f"{code}".encode())
-            response = self._client.recv(1024)
-            if code != 0:
-                return response
-        except ConnectionRefusedError or ConnectionResetError:
-            raise ConnectionError("something went wrong in the server-client connection.")
+    def _request(self,code: int,returnvariable):
+        print(code)
+        self._client.send(f"{code}".encode())
+        response = self._client.recv(1024)
+        if code != 0:
+            returnvariable = response
 
 
     
 
     def GetEditorText(self) -> str:
-        return threading.Thread(target=self._request, args=(11)).start()
+        m = None
+        threading.Thread(target=self._request, args=(11,m)).join()
+        return m
 
     def GetFileName(self) -> str:
-        return threading.Thread(target=self._request, args=(12)).start()
+        m = None
+        threading.Thread(target=self._request, args=(12,m)).join()
+        return m
 
     def TabCount(self) -> int:
-        return int(threading.Thread(target=self._request, args=(13)).start())
+        m = None
+        z = threading.Thread(target=self._request, args=(13,m))
+        z.start()
+        z.join()
+        return int(m)
 
     def ExitConnection(self) -> None:
         self.closed = True
