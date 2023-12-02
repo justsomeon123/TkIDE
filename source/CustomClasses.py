@@ -2,11 +2,10 @@
 #Most of the code here is adapted from stackoverflow to fit my needs.
 
 import os
-import subprocess
-import sys
-from tkinter import (BOTH, END, NE, Entry, Frame, Label, PhotoImage, Scrollbar,
-                     Text, Toplevel, font, ttk)
-
+from tkinter import (NE, Frame, Label, PhotoImage,
+                     Text,font,ttk)
+from pygments import lex
+import pygments.lexers as lexers
 
 #Adapted from https://stackoverflow.com/questions/3781670/how-to-highlight-text-in-a-tkinter-text-widget?rq=1, https://stackoverflow.com/questions/32058760/improve-pygments-syntax-highlighting-speed-for-tkinter-text
 class IDEText(Text):
@@ -32,6 +31,24 @@ class IDEText(Text):
         self.tag_configure("Token.Comment.Single", foreground="#bbbbbb")
         self.tag_configure("Token.Literal.Boolean", foreground="#a3F133")
         self.tag_configure("Token.Error",underline=True,foreground="#a23312")
+    
+    def highlight(self):
+        self.mark_set("range_start", "1.0")
+        _lex = lexers.get_lexer_for_filename(self.filename)
+
+        line_num = self.index("insert").split(".")[0]
+        line_bgn = line_num + ".0"
+        line_end = line_num + ".end"
+
+        data = self.get(line_bgn,line_end)
+        for token, content in lex(data,_lex):
+            print(token)
+            start = self.search(content,line_bgn,line_end) #Finds the index at which the current token starts
+            if not start:
+                break
+            print(start)
+            end = line_num + "." + str(int(start.split(".")[1]) + len(content)) #Finds the end of the current token using the length of the token
+            self.tag_add(str(token), start, end)
         
 
 

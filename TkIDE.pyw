@@ -1,4 +1,4 @@
-#Version:2.3.2 Last Updated:2023-10-28
+#Version:2.6 Last Updated:2023-12-1
 #Look at README.md for more information
 #############################################################################################
 #TkIDE.pyw
@@ -10,8 +10,8 @@ import random
 import socket
 import string
 import threading
-from tkinter import (BOTH, BOTTOM, CURRENT, END, HORIZONTAL, NW, RIGHT, Button,
-                     Event, Label, Menu, Scrollbar, Tk, Toplevel, filedialog,
+from tkinter import (BOTH, CURRENT, END, NW,
+                     Event, Menu, Tk, filedialog,
                      messagebox, ttk)
 
 #Make sure pil is always imported after any modules with a class called Image or ImageTk
@@ -21,6 +21,7 @@ from PIL import Image, ImageTk
 import source.CustomClasses as cc
 import source.ImportantFunctions
 import source.term as Terminal
+import source.tabs as tabs
 
 
 class Editor:
@@ -137,11 +138,13 @@ class Editor:
     
     def event_msg(self, code):
         #connection_key is the uid for each connection. self.extension_connections[connection_key] -> [""]
-        for connection_key in self.extension_connections: 
+        for connection_key in self.extension_connections.copy(): 
             try:
                 self.extension_connections[connection_key][2].send(f"SE:{code}".encode())
-            except ConnectionAbortedError:
-                self.extension_connections.pop(self.extension_connections[connection_key])
+            except ConnectionResetError:
+                print(self.extension_connections[connection_key])
+                self.extension_connections.pop(connection_key)
+                continue
     
     def old_client_handle(self,client_socket:socket.socket):
         #NOTE: Old code that doesn't support events, but also works completely as expected.
@@ -286,10 +289,10 @@ class Editor:
         "Dialog for opening a file"
         filename = filedialog.askopenfilename(initialdir = '/',title = "Choose a file to edit",)
         if filename.endswith(("png","gif","jpg","jpeg","ico")):
-            self.ImageTab(filename)
+            tabs.ImageTab(self,filename)
             return
         self.deprint(filename)
-        self.NewTab(filename)
+        tabs.FileTab(self,filename)
         self.event_msg(1)
 
     def CreateFile(self):
@@ -297,25 +300,16 @@ class Editor:
         f = filedialog.asksaveasfile(mode='w')
         if f is None:
             return
-        self.NewTab(f.name)
-
-    def DeleteFileConfirm(self):
-        """The confirmation dialog for deleting a file"""
-        self.deleteroot = Toplevel()
-        self.deleteroot.title('Are you sure?!')
-        Label(self.deleteroot,text="Are you sure that you want to delete a file?").pack()
-        Label(self.deleteroot,text="(Ireversible)",foreground="red").pack()
-        Button(self.deleteroot,text="Delete",foreground="red",activeforeground="dark red",background="dark red",activebackground="red",command=lambda:self.DeleteFile()).pack()
-        Button(self.deleteroot,text="Cancel",command=lambda:self.deleteroot.destroy()).pack()
+        tabs.FileTab(f.name)
     
     def DeleteFile(self):
-        filename = filedialog.askopenfilename(initialdir = '/',title    = "Choose file to delete",)
+        filename = filedialog.askopenfilename(initialdir = '/',title="Choose file to delete (Irreversible)",)
         os.remove(filename)
         self.deleteroot.destroy()
     
     def RandomString(self):
         """Generates a random string, kind of like uuid, but not universally unique. Don't even ask why this exists."""
-        return ''.join(random.choices(string.ascii_letters,k=10)) #1/141167095653376 chance to be the same (at least i think so.)
+        return ''.join(random.choices(string.ascii_letters,k=10)) #1/(52^10) probability of being same.
     
     def PopupMenu(self,event:Event):
         def copy():
@@ -341,7 +335,7 @@ class Editor:
             browseropen(f"https://www.google.com/?q={quote(event.widget.selection_get())}")
             del quote
             del browseropen
-            #always be secure kids!
+            #no need for this lol
    
             
 
@@ -353,73 +347,6 @@ class Editor:
         menu.add_command(label="Search selection",command=lambda:google())
         menu.add_separator()
         menu.post(event.x_root,event.y_root)
-
-    def NewTab(self,filename):
-        with open(filename,encoding="UTF-8") as f:
-            filecontent= f.read()
-        
-        #@ I don't even know. This code is unreadable. Please send help.
-        self.TabCount += 1
-        tab_identifier = self.RandomString()
-        self.TabIdentifiers.append(tab_identifier)
-        self.Pages[tab_identifier]  = (ttk.Frame(self.EditorPages),filename)
-        PageFrame = self.Pages[tab_identifier][0]        
-
-
-        self.EditorPages.add(PageFrame, text=f"{filename.split('/')[-1]}",image=self.root.FileIcon,compound="left")
-
-
-
-        SVBar = Scrollbar(PageFrame)
-        SVBar.pack(side = RIGHT, fill = "y")
-        SHBar = Scrollbar(PageFrame, orient = HORIZONTAL)
-        SHBar.pack(side = BOTTOM, fill = "x")
-
-        self.deprint(filename)
-
-        Display = cc.IDEText(PageFrame,filename=filename,height = 500, width = 500,yscrollcommand = SVBar.set,xscrollcommand = SHBar.set, wrap = "none")
-        Display.pack(expand = 0, fill = BOTH)
-        Display.bind("<Button-3>",lambda event:self.PopupMenu(event))
-
-
-        SHBar.config(command = Display.xview)
-        SVBar.config(command = Display.yview)
-
-        Display.insert(END,  f"""{filecontent}""")
-        
-
-
-        #@ Higlighting Code
-        if self.settings["enableHighlighting"]:
-            source.ImportantFunctions.highlight(Display)
-            self.root.bind("<KeyRelease>",lambda event: source.ImportantFunctions.highlight(Display))
-
-    def ImageTab(self,filename):
-        self.TabCount += 1
-        tab_identifier = self.RandomString()
-        self.TabIdentifiers.append(tab_identifier)
-        self.Pages[tab_identifier]  = (ttk.Frame(self.EditorPages),filename)
-        PageFrame = self.Pages[tab_identifier][0]
-        self.EditorPages.add(PageFrame, text=f"{filename.split('/')[-1]}",image=self.root.ImageIcon,compound="left") 
-        #@ ^  creating a tab for the image holder.
-
-        #WARN size can't be zero
-        
-        #@ v resize the image until it fits inside without being too big.
-        size=self.settings['imageResizeCoeffiecent']
-        image = Image.open(filename)
-        if image.size[0] * size < PageFrame.winfo_screenwidth(): 
-            if image.size[1] * size < PageFrame.winfo_screenheight():        
-                [imageSizeWidth, imageSizeHeight] = image.size
-                newImageSizeWidth = int(imageSizeWidth*size)
-                newImageSizeHeight = int(imageSizeHeight*size) 
-                image = image.resize((newImageSizeWidth, newImageSizeHeight), Image.Resampling.NEAREST)
-    
-        #@ Handles packing and showing the image in the screen.
-        img = ImageTk.PhotoImage(image)
-        label = Label(PageFrame, image=img,text="Image not supported/cannot be loaded")
-        label.image = img #WARN required for image to appear
-        label.pack()
 
 
 
