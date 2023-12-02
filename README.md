@@ -1,6 +1,6 @@
-# TkIDE  Version 2.3.2
+# TkIDE  Version 2.6
 
-## August goes. School comes. Coding goes down.
+## Christmas is coming...
 
 <br>
 
@@ -18,6 +18,10 @@
 - ### Tested on 3.10/3.11
 
 ## Changelog
+
+- ## 2.6
+  - Fixing more issues with extensions.
+  - De-legacying (ing?) code, read at [origin.md](origin.md)
 
 - ## 2.2.1
   - Added more commands, read at [commands.md](extensions/commands.md)

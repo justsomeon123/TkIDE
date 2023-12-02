@@ -17,7 +17,6 @@ class APIInstance:
         while not self.closed: 
             pos_event = event_socket.recv(1024).decode()
             if pos_event.startswith("SE:"):
-                print("yay")
                 event_code = pos_event.removeprefix("SE:")
                 for executor in events[event_code]:
                     eval(f"self.{executor}()",{"self":self}) 
