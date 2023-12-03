@@ -38,7 +38,7 @@ class Editor:
             
 
         #SECTION:Icons 
-        self.root.MainIcon = ImageTk.PhotoImage(Image.open(self.settings["icon"]),Image.Resampling.NEAREST)
+        MainIcon = ImageTk.PhotoImage(Image.open(self.settings["icon"]),Image.Resampling.NEAREST)
         self.root.FileIcon = ImageTk.PhotoImage(Image.open(self.settings["file-icon"]),Image.Resampling.NEAREST)
         self.root.ImageIcon = ImageTk.PhotoImage(Image.open(self.settings["image-icon"]),Image.Resampling.NEAREST)
 
@@ -53,7 +53,8 @@ class Editor:
         
 
         #SECTION:Root Management        
-        self.root.iconphoto(True,self.root.MainIcon)    
+        self.root.iconphoto(True,MainIcon) 
+        del MainIcon    
         self.root.title('TkIDE')
         source.ImportantFunctions.FullScreen(self.root)
 
