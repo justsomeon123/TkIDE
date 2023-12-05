@@ -10,8 +10,7 @@ import random
 import socket
 import string
 import threading
-from tkinter import (BOTH, CURRENT, END, NW,
-                     Event, Menu, Tk, filedialog,
+from tkinter import (BOTH, CURRENT, END, NW, Event, Menu, Tk, filedialog,
                      messagebox, ttk)
 
 #Make sure pil is always imported after any modules with a class called Image or ImageTk
@@ -20,8 +19,8 @@ from PIL import Image, ImageTk
 #Internal imports
 import source.CustomClasses as cc
 import source.ImportantFunctions
-import source.term as Terminal
 import source.tabs as tabs
+import source.term as Terminal
 
 
 class Editor:
@@ -39,22 +38,16 @@ class Editor:
 
         #SECTION:Icons 
         MainIcon = ImageTk.PhotoImage(Image.open(self.settings["icon"]),Image.Resampling.NEAREST)
-        self.root.FileIcon = ImageTk.PhotoImage(Image.open(self.settings["file-icon"]),Image.Resampling.NEAREST)
-        self.root.ImageIcon = ImageTk.PhotoImage(Image.open(self.settings["image-icon"]),Image.Resampling.NEAREST)
+        self.FileIcon = ImageTk.PhotoImage(Image.open(self.settings["file-icon"]),Image.Resampling.NEAREST)
+        self.ImageIcon = ImageTk.PhotoImage(Image.open(self.settings["image-icon"]),Image.Resampling.NEAREST)
 
         #SECTION:Shortcuts
         self.root.bind('<Control-o>',lambda event:self.OpenFile())
-        self.root.bind('<Control-s>',lambda event:self.Save())
         self.root.bind('<Control-n>',lambda event:self.CreateFile())
-        self.root.bind('<Control-d>',lambda event:self.DeleteFileConfirm())
         self.root.bind('<Control-`>',lambda event:self.Terminal())
 
-
-        
-
         #SECTION:Root Management        
-        self.root.iconphoto(True,MainIcon) 
-        del MainIcon    
+        self.root.iconphoto(True,MainIcon)     
         self.root.title('TkIDE')
         source.ImportantFunctions.FullScreen(self.root)
 
@@ -72,7 +65,7 @@ class Editor:
 
         ##SUBSECTION:Terminal Menu
         TerminalMenu = Menu(self.Menu,tearoff=0)
-        TerminalMenu.add_command(label='Terminal',command=lambda:self.Terminal())
+        TerminalMenu.add_command(label='Terminal',command=lambda:Terminal.TerminalWindow(self))
         ##SUBSECTION:Terminal Menu:END
 
         ##SUBSECTION:Menu adding
@@ -88,15 +81,12 @@ class Editor:
         self.EditorPages = cc.CustomNotebook(self.TabIdentifiers,self.Pages) #the main editor interface. (View CustomClasses.CustomNotebook for more information)
         self.EditorPages.pack(expand=True,fill=BOTH)
 
-
-
-
         ##SECTION:Welcome Page
         tab_identifier = self.RandomString() #Creates a tab identifier for this tab.
         self.TabIdentifiers.append(tab_identifier) #Adds it to the storage of tab identifiers.
         self.Pages[tab_identifier]  = (ttk.Frame(self.EditorPages),"welcomepage") #Stores the informaton on each pages critical parts
         PageFrame = self.Pages[tab_identifier][0] #PageFrame is the Frame holding the editor/page content
-        self.EditorPages.add(PageFrame, text=f"Home",image=self.root.MainIcon,compound="left") # Add a tab.
+        self.EditorPages.add(PageFrame, text=f"Home",image=MainIcon,compound="left") # Add a tab.
         ttk.Label(PageFrame,text="Press these buttons or use the menu at the top").pack(anchor=NW,pady=10) #Buttons on welcome page.
         ttk.Button(PageFrame,text="Open File",command=lambda:self.OpenFile()).pack(anchor=NW)
         ttk.Button(PageFrame,text="Create a New File",command=lambda:self.CreateFile()).pack(anchor=NW)
@@ -266,34 +256,19 @@ class Editor:
             #INFO UNKNOWN CODES
             else:
                 client_socket.send("CODE-INVALID".encode())
-            
-    def Terminal(self):
-        Terminal.TerminalWindow(self)
- 
-    def Save(self):
-        "Quick code to save current editor (text) state to the file."
-        index = self.EditorPages.index(CURRENT)
-        tab_identifier = self.TabIdentifiers[index]
-        Frame = self.Pages[tab_identifier][0]
-        children = Frame.winfo_children()
-
-        for child in children:
-            if type(child) == cc.IDEText:
-                self.Display = child
-
-        with open(self.Pages[tab_identifier][1],'r+') as f:
-            resave = self.Display.get('1.0','end-1c')
-            f.truncate()
-            f.write(resave)
 
     def OpenFile(self):
         "Dialog for opening a file"
         filename = filedialog.askopenfilename(initialdir = '/',title = "Choose a file to edit",)
-        if filename.endswith(("png","gif","jpg","jpeg","ico")):
-            tabs.ImageTab(self,filename)
-            return
-        self.deprint(filename)
-        tabs.FileTab(self,filename)
+        file_extension = os.path.splitext(filename)[1][1:]
+
+        # Check if the file extension is associated with any tab
+        for tab, extensions in self.settings["fileAssociations"].items():
+            if file_extension in extensions:
+                exec(f"{tab}(self,'{filename}')",{"tabs":tabs,"filename":filename,"self":self})
+                return
+        
+        exec(f"tabs.FileTab(self,'{filename}')",{"tabs":tabs,"filename":filename,"self":self})
         self.event_msg(1)
 
     def CreateFile(self):
