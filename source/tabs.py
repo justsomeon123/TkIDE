@@ -1,7 +1,10 @@
-from tkinter import (ttk,BOTTOM,RIGHT,Scrollbar,HORIZONTAL,BOTH,END,Label)
+"""Modularizes tabs into a different section of code. More expandable."""
+
+from tkinter import (ttk,BOTTOM,RIGHT,Scrollbar,HORIZONTAL,BOTH,END,Label,Frame)
 from . import CustomClasses as cc
 
 from PIL import Image,ImageTk
+
 
 #Created in an attempt to de-legacy this code.
 #Go-to origin.md for more info.
@@ -12,14 +15,14 @@ class Tab():
         tab_identifier = master.RandomString()
         master.TabIdentifiers.append(tab_identifier)
         master.Pages[tab_identifier]  = (ttk.Frame(master.EditorPages),title)
-        self.PageFrame = master.Pages[tab_identifier][0]        
+        self.PageFrame:Frame = master.Pages[tab_identifier][0]        
         
         master.EditorPages.add(self.PageFrame, text=title,image=kwargs["icon"],compound="left")
 
 class FileTab(Tab):
     def __init__(self,master,filename):
         #you can tell i suck lmao
-        super(FileTab,self).__init__(master,filename,icon=master.root.FileIcon)
+        super(FileTab,self).__init__(master,filename,icon=master.FileIcon)
 
         with open(filename,encoding="UTF-8") as f:
             filecontent= f.read()  
@@ -31,26 +34,32 @@ class FileTab(Tab):
 
         master.deprint(filename)
 
-        Display = cc.IDEText(self.PageFrame,filename=filename,height = 500, width = 500,yscrollcommand = SVBar.set,xscrollcommand = SHBar.set, wrap = "none")
-        Display.pack(expand = 0, fill = BOTH)
-        Display.bind("<Button-3>",lambda event:master.PopupMenu(event))
+        self.TextBox = cc.IDEText(self.PageFrame,filename=filename,height = 500, width = 500,yscrollcommand = SVBar.set,xscrollcommand = SHBar.set, wrap = "none")
+        self.TextBox.pack(expand = 0, fill = BOTH)
+        self.TextBox.bind("<Button-3>",lambda event:master.PopupMenu(event))
 
 
-        SHBar.config(command = Display.xview)
-        SVBar.config(command = Display.yview)
+        SHBar.config(command = self.TextBox.xview)
+        SVBar.config(command = self.TextBox.yview)
 
-        Display.insert(END,  f"""{filecontent}""")
-        
+        self.TextBox.insert(END,  f"""{filecontent}""")
 
 
         #@ Higlighting Code
         if master.settings["enableHighlighting"]:
-            Display.highlight()
-            master.root.bind("<KeyRelease>",lambda event: Display.highlight())
+            self.TextBox.highlight()
+            self.TextBox.bind("<KeyRelease>",lambda event: self.TextBox.highlight())
+        
+    def Save(self):
+        "Quick code to save current editor (text) state to the file."
+        with open(self.TextBox.filename,'r+') as f:
+            resave = self.TextBox.get('1.0','end-1c')
+            f.truncate()
+            f.write(resave)
 
 class ImageTab(Tab):
     def __init__(self,master,filename):
-        super(ImageTab, self).__init__(master,filename,icon=master.root.ImageIcon)
+        super(ImageTab, self).__init__(master,filename,icon=master.ImageIcon)
         
         #@ v resize the image until it fits inside without being too big.
         size= master.settings['imageResizeCoeffiecent']
