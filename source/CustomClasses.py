@@ -52,8 +52,6 @@ class IDEText(Text):
         
 
 
-
-
 #Adapted from https://stackoverflow.com/questions/39458337/is-there-a-way-to-add-close-buttons-to-tabs-in-tkinter-ttk-notebook
 
 class CustomNotebook(ttk.Notebook):

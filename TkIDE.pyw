@@ -7,20 +7,19 @@
 import json
 import os
 import random
-import socket
 import string
-import threading
-from tkinter import (BOTH, CURRENT, END, NW, Event, Menu, Tk, filedialog,
-                     messagebox, ttk)
+import platform
+from tkinter import (BOTH, NW, Event, Frame, Menu, Tk,
+                     filedialog, messagebox, ttk,Button)
 
 #Make sure pil is always imported after any modules with a class called Image or ImageTk
 from PIL import Image, ImageTk
 
 #Internal imports
 import source.CustomClasses as cc
-import source.ImportantFunctions
+import source.extensions as ext_lib
 import source.tabs as tabs
-import source.term as Terminal
+import source.term as term
 
 
 class Editor:
@@ -32,8 +31,12 @@ class Editor:
         with open('./assets/settings.json') as f:
             self.settings = json.load(f)
         
-
-        self.ext_server_init(settings=self.settings)
+        if self.settings["extensionsEnabled"]:
+            if self.settings["experimentalExtensions"]:
+                self.ExtensionManager = ext_lib.ExtensionManager()
+            else:
+                self.ExtensionManager = ext_lib.OldExtensionManager(self,self.settings)
+            pass
             
 
         #SECTION:Icons 
@@ -44,12 +47,21 @@ class Editor:
         #SECTION:Shortcuts
         self.root.bind('<Control-o>',lambda event:self.OpenFile())
         self.root.bind('<Control-n>',lambda event:self.CreateFile())
-        self.root.bind('<Control-`>',lambda event:self.Terminal())
+        self.root.bind('<Control-`>',lambda event:term.TerminalWindow())
+        self.root.bind('<Control-p>',lambda event:self.TestEvent())
 
         #SECTION:Root Management        
         self.root.iconphoto(True,MainIcon)     
         self.root.title('TkIDE')
-        source.ImportantFunctions.FullScreen(self.root)
+
+        pltfrm = platform.system()
+        if pltfrm == "Windows" or "OSX":
+            self.root.state('zoomed')
+        if pltfrm == "Linux":
+            self.root.attributes('-zoomed', True)
+        else:
+            pass
+
 
         #self.__settingsinit__()
         #SECTION:Menus  
@@ -60,12 +72,12 @@ class Editor:
         FileMenu.add_command(label='Create a New File',command=lambda:self.CreateFile())
         FileMenu.add_command(label="Save",command=lambda:self.Save())
         FileMenu.add_separator(background="red")
-        FileMenu.add_command(label="Delete a File",foreground="red",command=lambda:self.DeleteFileConfirm(),background="dark red")
+        FileMenu.add_command(label="Delete a File",foreground="red",command=lambda:self.DeleteFile(),background="dark red")
         ##SUBSECTION:File Menu:END
 
         ##SUBSECTION:Terminal Menu
         TerminalMenu = Menu(self.Menu,tearoff=0)
-        TerminalMenu.add_command(label='Terminal',command=lambda:Terminal.TerminalWindow(self))
+        TerminalMenu.add_command(label='Terminal',command=lambda:term.TerminalWindow(self))
         ##SUBSECTION:Terminal Menu:END
 
         ##SUBSECTION:Menu adding
@@ -97,165 +109,31 @@ class Editor:
 
         #SECTION:Loop
         self.root.mainloop() #Gui loop.
+    
+    def TestEvent(self):
+        ttk.Style().configure("Bw.TLabel",bg="#aba89f")
+        ext_lib.LoadExtensions()
+
+        menoo = Frame(self.root,background="#aba89f")
+        menoo.current_width = 100
+
+        def animate():
+            menoo.place(relx=0.5, rely=0, relwidth=(menoo.current_width / 181.818), relheight=(menoo.current_width/250), anchor="n")
+            menoo.current_width -= 0.1 + (10/menoo.current_width)
+            if menoo.current_width > 0:
+                self.root.after(10, animate)
+            else:
+                menoo.place_forget()
+
+        ttk.Label(menoo, text="Test",style="Bw.TLabel").pack()
+        Button(menoo, text="Press to Hide", command=animate,relief="flat",bg="#aaaaaa").pack(anchor="s", expand=1, fill="x", side="bottom", padx=1, pady=1,)
+
+        
+        menoo.place(relx=0.5, rely=0, relwidth=(menoo.current_width / 181.818), relheight=(menoo.current_width/250), anchor="n")
 
     def deprint(self,text):
         if self.settings["debug"]:
             print(text)
-    
-    def ext_server_init(self,settings):
-        self.extension_connections = {}
-        self.server_thread = threading.Thread(target=self.ext_server,args=())
-        self.server_thread.daemon = True #background thread
-        if settings["extensionsEnabled"]:
-            self.server_thread.start()
-
-    def ext_server(self):
-        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_address = ("localhost",49155) #port in dynamic range.
-        server_socket.bind(server_address)
-        server_socket.listen(self.settings["maxExtConnections"]*2) #Double it so that each extension can listen to events.
-        self.deprint("server listening")
-        while True:
-            client_socket, client_address = server_socket.accept() #Client socket is the socket created by the server to communicate with the client.
-            self.deprint(f"client connect:{client_address}")
-
-            #Starts a thread to handle the client called client thread
-            if self.settings["experimentalExtensions"]:
-                client_thread = threading.Thread(target=self.client_handle,args=(client_socket,))
-            else:
-                client_thread = threading.Thread(target=self.old_client_handle,args=(client_socket,))
-            client_thread.daemon = True
-            client_thread.start()
-    
-    def event_msg(self, code):
-        #connection_key is the uid for each connection. self.extension_connections[connection_key] -> [""]
-        for connection_key in self.extension_connections.copy(): 
-            try:
-                self.extension_connections[connection_key][2].send(f"SE:{code}".encode())
-            except ConnectionResetError:
-                print(self.extension_connections[connection_key])
-                self.extension_connections.pop(connection_key)
-                continue
-    
-    def old_client_handle(self,client_socket:socket.socket):
-        #NOTE: Old code that doesn't support events, but also works completely as expected.
-
-        #INFO Client socket is actually a subsocket created by the server to respond to the actual request
-        #INFO (cont.) /communicate with the real client.
-
-        sockclose = False
-        while not sockclose:
-            data = client_socket.recv(1024).decode() #Recieve data.
-
-            #Initial info.
-            if not data.startswith("ER:"):
-                data = int(data)
-
-
-            if (type(data)!=int) and (data.startswith('ER:')): #Connection accepted.
-                idn = self.RandomString()
-                client_socket.send(f"{idn}".encode())
-                self.extension_connections[idn] = data.removeprefix('ER:')
-            
-            elif data == 0:
-                sockclose = True
-                client_socket.close()
-
-            #INFO READ FUNCTIONS BELOW. READ FUNCTIONS START WITH 1.   
-
-            elif data == 11:
-                #This code is adapted from the save function below
-                display = 0
-                for child in self.Pages[self.TabIdentifiers[self.EditorPages.index(CURRENT)]][0].winfo_children():
-                    if (display == 0): #I feel like this code is demented. I wrote it at 4 am idrk.
-                        display = 0
-                    if type(child) == cc.IDEText:
-                        display = child
-                if display == 0:
-                    client_socket.send("NO-TEXT".encode())
-                else:
-                    client_socket.send(display.get("0.0",END).encode())
-
-            elif data == 12:
-                #Turns out this also works to get the filename.
-                display = 0
-                for child in self.Pages[self.TabIdentifiers[self.EditorPages.index(CURRENT)]][0].winfo_children():
-                    if (display == 0): #I feel like this code is demented. I wrote it at 4 am idrk.
-                        display = 0
-                    if type(child) == cc.IDEText:
-                        display = child
-                if display == 0:
-                    client_socket.send("NO-FILE".encode())
-                else:
-                    client_socket.send(display.filename.encode())
-            
-            elif data == 13:
-                client_socket.send(str(len(self.EditorPages.tabs())).encode())
-
-            #INFO UNKNOWN CODES
-            else:
-                client_socket.send("CODE-INVALID".encode())
-
-    def client_handle(self,client_socket:socket.socket):
-        #INFO Client socket is actually a subsocket created by the server to respond to the actual request
-        #INFO (cont.) /communicate with the real client.
-
-        sockclose = False
-        while not sockclose:
-            data = client_socket.recv(1024).decode() #Recieve data.
-
-            #Initial info.
-            if not data.startswith("ER:") and not data.startswith("ELR:"):
-                data = int(data)
-
-
-            elif (type(data)!=int) and (data.startswith('ER:')): #Connection accepted.
-                idn = self.RandomString()
-                client_socket.send(f"{idn}".encode())
-                self.extension_connections[idn] = [data.removeprefix('ER:'),client_socket]
-            
-            elif (type(data)!=int) and (data.startswith('ELR:')):
-                idn = data.removeprefix("ELR:") #Event Listener for extension with code idn.
-                self.extension_connections[idn].append(client_socket)
-            
-            elif data == 0:
-                sockclose = True
-                client_socket.close()
-
-            #INFO READ FUNCTIONS BELOW. READ FUNCTIONS START WITH 1.   
-
-            elif data == 11:
-                #This code is adapted from the save function below
-                display = 0
-                for child in self.Pages[self.TabIdentifiers[self.EditorPages.index(CURRENT)]][0].winfo_children():
-                    if (display == 0): #I feel like this code is demented. I wrote it at 4 am idrk.
-                        display = 0
-                    if type(child) == cc.IDEText:
-                        display = child
-                if display == 0:
-                    client_socket.send("NO-TEXT".encode())
-                else:
-                    client_socket.send(display.get("0.0",END).encode())
-
-            elif data == 12:
-                #Turns out this also works to get the filename.
-                display = 0
-                for child in self.Pages[self.TabIdentifiers[self.EditorPages.index(CURRENT)]][0].winfo_children():
-                    if (display == 0): #I feel like this code is demented. I wrote it at 4 am idrk.
-                        display = 0
-                    if type(child) == cc.IDEText:
-                        display = child
-                if display == 0:
-                    client_socket.send("NO-FILE".encode())
-                else:
-                    client_socket.send(display.filename.encode())
-            
-            elif data == 13:
-                client_socket.send(str(len(self.EditorPages.tabs())).encode())
-
-            #INFO UNKNOWN CODES
-            else:
-                client_socket.send("CODE-INVALID".encode())
 
     def OpenFile(self):
         "Dialog for opening a file"
@@ -263,9 +141,9 @@ class Editor:
         file_extension = os.path.splitext(filename)[1][1:]
 
         # Check if the file extension is associated with any tab
-        for tab, extensions in self.settings["fileAssociations"].items():
+        for tabKind, extensions in self.settings["fileAssociations"].items():
             if file_extension in extensions:
-                exec(f"{tab}(self,'{filename}')",{"tabs":tabs,"filename":filename,"self":self})
+                exec(f"{tabKind}(self,'{filename}')",{"tabs":tabs,"filename":filename,"self":self})
                 return
         
         exec(f"tabs.FileTab(self,'{filename}')",{"tabs":tabs,"filename":filename,"self":self})
@@ -276,12 +154,11 @@ class Editor:
         f = filedialog.asksaveasfile(mode='w')
         if f is None:
             return
-        tabs.FileTab(f.name)
+        self.OpenFile(f.name)
     
     def DeleteFile(self):
         filename = filedialog.askopenfilename(initialdir = '/',title="Choose file to delete (Irreversible)",)
         os.remove(filename)
-        self.deleteroot.destroy()
     
     def RandomString(self):
         """Generates a random string, kind of like uuid, but not universally unique. Don't even ask why this exists."""
@@ -296,11 +173,11 @@ class Editor:
         def cut():
             event.widget.clipboard_clear()
             self.deprint(event.widget.selection_get())
-            event.widget.delete("sel.first","sel.last")
+            delete()
             event.widget.clipboard_append(event.widget.selection_get())
         
         def paste():
-            event.widget.insert("sel.first",event.widget.clipboard_get())
+            event.widget.insert("cursor",event.widget.clipboard_get())
         
         def delete():
             event.widget.delete("sel.first","sel.last")

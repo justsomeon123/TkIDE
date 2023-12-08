@@ -6,7 +6,7 @@
     "enableHighlighting":true,
     "debug":true,
     "extensionsEnabled":true,
-    "experimentalExtensions":true,
+    "experimentalExtensions":false,
     "maxExtConnections":10,
     "fileAssociations":{
         "tabs.ImageTab":["png","gif","jpg","jpeg","ico"]
