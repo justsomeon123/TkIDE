@@ -67,9 +67,6 @@ class TerminalWindow:
         else:
             self.print( f"Error: command \"{command}\" not known \n")
 
-
-
-
 class TrueTerminalWindow():
     def __init__(self):
         self.main = tk.Toplevel()

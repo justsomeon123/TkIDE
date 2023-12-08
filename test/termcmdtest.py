@@ -25,4 +25,4 @@ if Command["process"]["add"] and Command['process']["add"]:
 code += f"return {','.join(Command['return'])}"
 exec(code)
 
-print(cmd(123)) #WARN ignore error, will work.
+print(cmd(123)) #NOTE ignore error, will work.
