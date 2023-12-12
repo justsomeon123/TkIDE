@@ -7,7 +7,10 @@ class ExtensionManager:
         self.extension_list = []
 
     def LoadExtensions(self):
-        extension_list = [import_module("extensions."+i.removesuffix(".py")) if i.endswith(".py") else None for i in os.listdir(os.curdir+"\extensions")]
+        self.extension_list = [import_module("extensions."+i.removesuffix(".py")) if i.endswith(".py") else None for i in os.listdir(os.curdir+"\extensions")]
+    
+    def RunMains(self,master):
+        [extension.main(master) if extension is not None else None for extension in self.extension_list] #ok I might be taking list comprehension a bit far here...
 
 class OldExtensionManager():
         

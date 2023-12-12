@@ -6,11 +6,11 @@
 
 import json
 import os
+import platform
 import random
 import string
-import platform
-from tkinter import (BOTH, NW, Event, Frame, Menu, Tk,
-                     filedialog, messagebox, ttk,Button)
+from tkinter import (BOTH, NW, Button, Event, Frame, Menu, Tk, filedialog,
+                     messagebox, ttk)
 
 #Make sure pil is always imported after any modules with a class called Image or ImageTk
 from PIL import Image, ImageTk
@@ -33,9 +33,9 @@ class Editor:
         
         if self.settings["extensionsEnabled"]:
             if self.settings["experimentalExtensions"]:
-                self.ExtensionManager = ext_lib.ExtensionManager()
+                self.ext_mgr = ext_lib.ExtensionManager()
             else:
-                self.ExtensionManager = ext_lib.OldExtensionManager(self,self.settings)
+                self.ext_mgr = ext_lib.OldExtensionManager(self,self.settings)
             pass
             
 
@@ -112,16 +112,16 @@ class Editor:
     
     def TestEvent(self):
         ttk.Style().configure("Bw.TLabel",bg="#aba89f")
-        ext_lib.LoadExtensions()
+        self.ext_mgr.LoadExtensions();self.ext_mgr.RunMains(self);
 
         menoo = Frame(self.root,background="#aba89f")
         menoo.current_width = 100
 
         def animate():
             menoo.place(relx=0.5, rely=0, relwidth=(menoo.current_width / 181.818), relheight=(menoo.current_width/250), anchor="n")
-            menoo.current_width -= 0.1 + (10/menoo.current_width)
+            menoo.current_width -= 0.1 + (40/menoo.current_width)
             if menoo.current_width > 0:
-                self.root.after(10, animate)
+                self.root.after(5, animate)
             else:
                 menoo.place_forget()
 
@@ -146,8 +146,15 @@ class Editor:
                 exec(f"{tabKind}(self,'{filename}')",{"tabs":tabs,"filename":filename,"self":self})
                 return
         
+        #Default to fileTab
+        self.event_msg(1,"<<OpenFile>>")
         exec(f"tabs.FileTab(self,'{filename}')",{"tabs":tabs,"filename":filename,"self":self})
-        self.event_msg(1)
+        
+
+    def event_msg(self,code=0,sequence="<<None>>"):
+        if not self.settings["experimentalExtensions"]:
+            self.ext_mgr.event_msg(code)
+        else: self.root.event_generate(sequence,when="now")
 
     def CreateFile(self):
         "Dialog for creating a new file"
@@ -155,10 +162,12 @@ class Editor:
         if f is None:
             return
         self.OpenFile(f.name)
+        self.event_msg(2,"<<CreateFile>>")
     
     def DeleteFile(self):
         filename = filedialog.askopenfilename(initialdir = '/',title="Choose file to delete (Irreversible)",)
         os.remove(filename)
+        self.event_msg(3,"<<DeleteFile>>")
     
     def RandomString(self):
         """Generates a random string, kind of like uuid, but not universally unique. Don't even ask why this exists."""
