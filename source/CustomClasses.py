@@ -71,17 +71,6 @@ class CustomNotebook(ttk.Notebook):
 
         self._active = None
 
-        self.TabMoveframe = Frame(self)
-        self.TabMoveframe.pack(anchor=NE)
-        self.BackTabButton = Label(self.TabMoveframe,text="\u276E ",font=font.Font(size=14))
-        self.FrontTabButton = Label(self.TabMoveframe,text="\u276F ",font=font.Font(size=14))
-        self.TabMenuButton = Label(self.TabMoveframe,text="\u2630 ",font=font.Font(size=14))
-        self.BackTabButton.grid(row=1,column=0)
-        self.BackTabButton.bind('<Button-1>',lambda event:self.select(self.index(self.select())-1))
-        self.FrontTabButton.grid(row=1,column=1)
-        self.FrontTabButton.bind('<Button-1>',lambda event:self.select(self.index(self.select())+1))
-        self.TabMenuButton.grid(row=1,column=2)
-
         self.bind("<ButtonPress-1>", self.on_close_press, True)
         self.bind("<ButtonRelease-1>", self.on_close_release)
     
@@ -203,5 +192,3 @@ class FileSystemWidget(ttk.Frame):
             return "dir"
         else:
             return "file"
-
-#* Terminal has been moved to source/term.py
