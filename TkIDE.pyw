@@ -112,7 +112,7 @@ class Editor:
     
     def TestEvent(self):
         ttk.Style().configure("Bw.TLabel",bg="#aba89f")
-        self.ext_mgr.LoadExtensions();self.ext_mgr.RunMains(self);
+        self.ext_mgr.LoadExtensionsFrom();self.ext_mgr.RunMains(self);
 
         menoo = Frame(self.root,background="#aba89f")
         menoo.current_width = 100
@@ -150,11 +150,8 @@ class Editor:
         self.event_msg(1,"<<OpenFile>>")
         exec(f"tabs.FileTab(self,'{filename}')",{"tabs":tabs,"filename":filename,"self":self})
         
-
     def event_msg(self,code=0,sequence="<<None>>"):
-        if not self.settings["experimentalExtensions"]:
-            self.ext_mgr.event_msg(code)
-        else: self.root.event_generate(sequence,when="now")
+        self.ext_mgr.event_msg(code) if not self.settings["experimentalExtensions"] else self.root.event_generate(sequence,when="now")
 
     def CreateFile(self):
         "Dialog for creating a new file"

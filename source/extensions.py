@@ -1,16 +1,25 @@
 from importlib import import_module
-import os,threading,socket
+import os,threading,socket,pathlib
 import source.CustomClasses as cc
 
 class ExtensionManager:
     def __init__(self) -> None:
         self.extension_list = []
 
-    def LoadExtensions(self):
-        self.extension_list = [import_module("extensions."+i.removesuffix(".py")) if i.endswith(".py") else None for i in os.listdir(os.curdir+"\extensions")]
-    
+    def LoadExtensionsFrom(self,pth=os.curdir+"/extensions"):
+         """Load extensions from a folder (default ./extensions), including subfolders. All '_' prefixes are ignored. Path must be below/at same level as path of TkIDE.pyw"""
+         for root,dirs,files in os.walk(pth):
+            if not pathlib.Path(root).parts[-1].startswith("_"): #check folder for _ prefix and ignores.
+                for file in files:
+                    if file.endswith(".py") and not file.startswith("_"):
+                        relative_path = pathlib.Path(root).relative_to(os.curdir)
+                        module_path = '.'.join(
+                            list(relative_path.parts) + [file.removesuffix(".py")] #relative folder names + name = import package style
+                        )
+                        self.extension_list.append(import_module(module_path))         
+
     def RunMains(self,master):
-        [extension.main(master) if extension is not None else None for extension in self.extension_list] #ok I might be taking list comprehension a bit far here...
+        [extension.main(master) if extension is not None else None for extension in self.extension_list]
 
 class OldExtensionManager():
         
