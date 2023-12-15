@@ -10,10 +10,9 @@ import platform
 import random
 import string
 from tkinter import (BOTH, NW, Button, Event, Frame, Menu, Tk, filedialog,
-                     messagebox, ttk)
+                     messagebox, ttk,PhotoImage)
 
 #Make sure pil is always imported after any modules with a class called Image or ImageTk
-from PIL import Image, ImageTk
 
 #Internal imports
 import source.CustomClasses as cc
@@ -40,9 +39,9 @@ class Editor:
             
 
         #SECTION:Icons 
-        MainIcon = ImageTk.PhotoImage(Image.open(self.settings["icon"]),Image.Resampling.NEAREST)
-        self.FileIcon = ImageTk.PhotoImage(Image.open(self.settings["file-icon"]),Image.Resampling.NEAREST)
-        self.ImageIcon = ImageTk.PhotoImage(Image.open(self.settings["image-icon"]),Image.Resampling.NEAREST)
+        MainIcon = PhotoImage(file=self.settings["icon"])
+        self.FileIcon = PhotoImage(file=self.settings["file-icon"])
+        self.ImageIcon = PhotoImage(file=self.settings["image-icon"])
 
         #SECTION:Shortcuts
         self.root.bind('<Control-o>',lambda event:self.OpenFile())
