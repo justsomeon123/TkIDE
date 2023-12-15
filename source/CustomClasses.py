@@ -106,14 +106,6 @@ class CustomNotebook(ttk.Notebook):
 
         self.state(["!pressed"])
         self._active = None
-    
-    def forceclose(self):
-        index = self.se
-        if self._active == index:
-            self.forget(index)
-            self.StringDict.pop(self.TabList[index])
-            self.TabList.pop(index)
-            self.event_generate("<<NotebookTabClosed>>")
 
     def __initialize_custom_style(self):
         style = ttk.Style()
