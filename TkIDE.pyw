@@ -137,6 +137,8 @@ class Editor:
     def OpenFile(self):
         "Dialog for opening a file"
         filename = filedialog.askopenfilename(initialdir = '/',title = "Choose a file to edit",)
+        if filename == "": return
+        
         file_extension = os.path.splitext(filename)[1][1:]
 
         # Check if the file extension is associated with any tab
