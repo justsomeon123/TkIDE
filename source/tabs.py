@@ -1,23 +1,25 @@
 """Modularizes tabs into a different section of code. More expandable."""
 
-from tkinter import (ttk,BOTTOM,RIGHT,Scrollbar,HORIZONTAL,BOTH,END,Label,Frame)
+from tkinter import (BOTH, BOTTOM, END, HORIZONTAL, RIGHT, Frame, Label,
+                     Scrollbar, ttk)
+
+from PIL import Image, ImageTk
+
 from . import CustomClasses as cc
-
-from PIL import Image,ImageTk
-
 
 #Created in an attempt to de-legacy this code.
 #Go-to origin.md for more info.
 
 class Tab():
-    def __init__(self,master,title,**kwargs) -> None:
+    def __init__(self,master,title,icon="",**kwargs) -> None:
         master.TabCount += 1
         tab_identifier = master.RandomString()
         master.TabIdentifiers.append(tab_identifier)
         master.Pages[tab_identifier]  = (ttk.Frame(master.EditorPages),title)
-        self.PageFrame:Frame = master.Pages[tab_identifier][0]        
-        
-        master.EditorPages.add(self.PageFrame, text=title,image=kwargs["icon"],compound="left")
+        self.PageFrame:Frame = master.Pages[tab_identifier][0]
+        if icon == "": icon = master.FileIcon
+
+        master.EditorPages.add(self.PageFrame, text=title,image=icon,compound="left")
 
 class FileTab(Tab):
     def __init__(self,master,filename):
