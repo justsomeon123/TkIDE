@@ -1,6 +1,11 @@
+import os
+import pathlib
+import socket
+import threading
 from importlib import import_module
-import os,threading,socket,pathlib
-import source.CustomClasses as cc
+
+import CustomClasses as cc
+
 
 class ExtensionManager:
     def __init__(self) -> None:
@@ -16,7 +21,7 @@ class ExtensionManager:
                         module_path = '.'.join(
                             list(relative_path.parts) + [file.removesuffix(".py")] #relative folder names + name = import package style
                         )
-                        self.extension_list.append(import_module(module_path))         
+                        self.extension_list.append(import_module(module_path,"extensions"))         
 
     def RunMains(self,master):
         [extension.main(master) if extension is not None else None for extension in self.extension_list]

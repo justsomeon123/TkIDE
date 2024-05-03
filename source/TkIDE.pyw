@@ -1,4 +1,4 @@
-#Version:2.6 Last Updated:2023-12-1
+#Version:2.7 Last Updated:2023-12-1
 #Look at README.md for more information
 #############################################################################################
 #TkIDE.pyw
@@ -12,13 +12,11 @@ import string
 from tkinter import (BOTH, NW, Button, Event, Frame, Menu, Tk, filedialog,
                      messagebox, ttk,PhotoImage)
 
-#Make sure pil is always imported after any modules with a class called Image or ImageTk
-
 #Internal imports
-import source.CustomClasses as cc
-import source.extensions as ext_lib
-import source.tabs as tabs
-import source.term as term
+import CustomClasses as cc
+import extensions as ext_lib
+import tabs
+import term
 
 
 class Editor:

@@ -3,9 +3,8 @@
 from tkinter import (BOTH, BOTTOM, END, HORIZONTAL, RIGHT, Frame, Label,
                      Scrollbar, ttk)
 
+import CustomClasses as cc
 from PIL import Image, ImageTk
-
-from . import CustomClasses as cc
 
 #Created in an attempt to de-legacy this code.
 #Go-to origin.md for more info.
@@ -23,7 +22,7 @@ class Tab():
 
 class FileTab(Tab):
     def __init__(self,master,filename):
-        #you can tell i suck lmao
+        
         super(FileTab,self).__init__(master,filename,icon=master.FileIcon)
 
         with open(filename,encoding="UTF-8") as f:
