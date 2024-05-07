@@ -2,10 +2,11 @@
 #Most of the code here is adapted from stackoverflow to fit my needs.
 
 import os
-from tkinter import (NE, Frame, Label, PhotoImage,
-                     Text,font,ttk)
-from pygments import lex
+from tkinter import NE, Frame, Label, PhotoImage, Text, font, ttk
+
 import pygments.lexers as lexers
+from pygments import lex
+
 
 #Adapted from https://stackoverflow.com/questions/3781670/how-to-highlight-text-in-a-tkinter-text-widget?rq=1, https://stackoverflow.com/questions/32058760/improve-pygments-syntax-highlighting-speed-for-tkinter-text
 class IDEText(Text):
@@ -42,11 +43,11 @@ class IDEText(Text):
 
         data = self.get(line_bgn,line_end)
         for token, content in lex(data,_lex):
-            print(token)
+            #print(token)
             start = self.search(content,line_bgn,line_end) #Finds the index at which the current token starts
             if not start:
                 break
-            print(start)
+            #print(start)
             end = line_num + "." + str(int(start.split(".")[1]) + len(content)) #Finds the end of the current token using the length of the token
             self.tag_add(str(token), start, end)
         

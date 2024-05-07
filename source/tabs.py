@@ -3,8 +3,9 @@
 from tkinter import (BOTH, BOTTOM, END, HORIZONTAL, RIGHT, Frame, Label,
                      Scrollbar, ttk)
 
-import CustomClasses as cc
 from PIL import Image, ImageTk
+
+import source.CustomClasses as cc
 
 #Created in an attempt to de-legacy this code.
 #Go-to origin.md for more info.

@@ -4,7 +4,7 @@ import socket
 import threading
 from importlib import import_module
 
-import CustomClasses as cc
+import source.CustomClasses as cc
 
 
 class ExtensionManager:

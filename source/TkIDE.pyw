@@ -9,14 +9,14 @@ import os
 import platform
 import random
 import string
-from tkinter import (BOTH, NW, Button, Event, Frame, Menu, Tk, filedialog,
-                     messagebox, ttk,PhotoImage)
+from tkinter import (BOTH, NW, Button, Event, Frame, Menu, PhotoImage, Tk,
+                     filedialog, messagebox, ttk)
 
 #Internal imports
-import CustomClasses as cc
-import extensions as ext_lib
-import tabs
-import term
+import source.CustomClasses as cc
+import source.extensions as ext_lib
+import source.tabs as tabs
+import source.term as term
 
 
 class Editor:
@@ -207,9 +207,6 @@ class Editor:
         menu.post(event.x_root,event.y_root)
 
 
-
-if __name__ == "__main__":
-    Editor()
             
 #*Build with
 #*pyinstaller TkIDE.pyw -F -w -i icon.ico -n TkIDE  
